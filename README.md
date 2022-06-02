@@ -31,11 +31,11 @@ cell-count/
 |   |-- main.py
 |   |-- model.py
 |
-|-- setup.py
 |-- AUTHORS
 |-- LICENSE
 |-- README.md
 |-- requirements.txt 
+|-- setup.py
 |-- TODO.md
 ```
 
