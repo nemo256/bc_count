@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: cell-count
+Version: 0.0.2
+Summary: Count blood cells
+Home-page: https://github.com/nemo256/cell-count
+Author: nemo256 (Amine Neggazi)
+Author-email: <neggazimedlamine@gmail.com>
+Keywords: python,artificial intelligence,deep learning,blood cells,image segmentation,unet
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Provides-Extra: testing
+License-File: LICENSE
+License-File: AUTHORS
+
+Count red, white blood cells to detect various diseases such as blood cancer (leukemia), lower red blood cells (anemia)...
