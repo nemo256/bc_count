@@ -1,4 +1,8 @@
+import os
 import json
+
+import cv2
+import numpy as np
 from tensorflow import keras
 
 
@@ -175,16 +179,18 @@ def test_chips(imgs, mask, edge,
                 chip_y_r = int(y + (input_size / 2))
 
                 temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
-                temp_mask = mask[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
-                temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+                temp_mask = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
+                temp_edge = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
 
                 temp_chip = temp_chip.astype(np.float32) * 2
+                temp_mask = temp_mask.astype(np.float32) * 2
+                temp_edge = temp_mask.astype(np.float32) * 2
                 temp_chip /= 255
                 temp_chip -= 1
 
                 img_chips += [temp_chip]
-                mask_chips += [(temp_mask > 0).astype(float)[..., np.newaxis]]
-                edge_chips += [(temp_edge > 0).astype(float)[..., np.newaxis]]
+                mask_chips += [temp_mask > 0]
+                edge_chips += [temp_mask > 0]
 
     img_chips = np.array(img_chips)
     mask_chips = np.array(mask_chips)
