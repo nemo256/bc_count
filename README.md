@@ -15,9 +15,6 @@ cell-count/
 |   |-- cell-count
 |
 |-- docs/
-|   |-- data.py
-|   |-- main.py
-|   |-- model.py
 |
 |-- cell-count/
 |   |-- test/
