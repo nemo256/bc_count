@@ -1,5 +1,5 @@
 # Cell count
-Count red, white blood cells to detect various diseases such as blood cancer (leukemia), anemia...
+Count red, white blood cells to detect various diseases such as blood cancer (leukemia), lower red blood cells (anemia)...
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
