@@ -5,7 +5,9 @@ Count red, white blood cells to detect various diseases such as blood cancer (le
 ## Table of Contents
 
 * [Project Structure](#project-structure)
-* [Setup](#setup)
+* [Install](#install)
+* [Usage](#usage)
+* [Develop](#develop)
 * [License](#license)
 
 ## Project Structure
@@ -28,6 +30,12 @@ bc-count/
 |
 |-- docs/
 |
+|-- data/
+|   |-- rbc/
+|   |-- wbc/
+|
+|-- models/
+|
 |-- AUTHORS
 |-- LICENSE
 |-- README.md
@@ -36,8 +44,28 @@ bc-count/
 |-- TODO.md
 ```
 
-## Setup
+## Install
+- Install straight from PyPI using pip:
+```
+$ pip install bc-count
+```
+## Usage
+> Please read `bc-count --help` before using it
+> -o flag is optional (defaults to out/ directory)
+- Count blood cells (-r for red and -w for white):
+```
+$ bc-count <blood-cell-image>
+```
+- Predict blood cell image:
+```
+$ bc-count predict -r <blood-cell-image>
+```
+- Train a new model:
+```
+$ bc-count train -r <model-name>
+```
 
+## Develop
 - Download the project:
 ```
 $ git clone https://github.com/nemo256/bc-count
@@ -49,7 +77,7 @@ $ python -m venv venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
-- Now just run the script:
+- Now just adapt the code to your need and then run using the command:
 ```
 $ python bc-count/main.py
 ```
