@@ -126,6 +126,8 @@ def train_generator(imgs, mask, edge,
             temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
 
             if skip_empty:
+                if temp_chip.size == 0:
+                    continue
                 if temp_mask.size == 0:
                     continue
                 if temp_edge.size == 0:
