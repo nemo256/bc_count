@@ -1,5 +1,5 @@
-cell\-count package
-===================
+bc\-count package
+=================
 
 Subpackages
 -----------
@@ -7,31 +7,31 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   cell-count.test
+   bc-count.test
 
 Submodules
 ----------
 
-cell\-count.data module
------------------------
+bc\-count.data module
+---------------------
 
-.. automodule:: cell-count.data
+.. automodule:: bc-count.data
    :members:
    :undoc-members:
    :show-inheritance:
 
-cell\-count.main module
------------------------
+bc\-count.main module
+---------------------
 
-.. automodule:: cell-count.main
+.. automodule:: bc-count.main
    :members:
    :undoc-members:
    :show-inheritance:
 
-cell\-count.model module
-------------------------
+bc\-count.model module
+----------------------
 
-.. automodule:: cell-count.model
+.. automodule:: bc-count.model
    :members:
    :undoc-members:
    :show-inheritance:
@@ -39,7 +39,7 @@ cell\-count.model module
 Module contents
 ---------------
 
-.. automodule:: cell-count
+.. automodule:: bc-count
    :members:
    :undoc-members:
    :show-inheritance:

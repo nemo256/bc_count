@@ -12,12 +12,12 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, '/root/Work/cell-count/cell-count')
+# sys.path.insert(0, '/root/Work/bc-count/bc-count')
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'cell-count'
+project = 'bc-count'
 copyright = '2022, Author'
 author = 'Author'
 

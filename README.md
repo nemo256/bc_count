@@ -1,4 +1,4 @@
-# Cell count
+# BC count
 Count red, white blood cells to detect various diseases such as blood cancer (leukemia), lower red blood cells (anemia)...
 
 <!-- TABLE OF CONTENTS -->
@@ -10,13 +10,10 @@ Count red, white blood cells to detect various diseases such as blood cancer (le
 
 ## Project Structure
 ```
-cell-count/
-|-- bin/
-|   |-- cell-count
-|
+bc-count/
 |-- docs/
 |
-|-- cell-count/
+|-- bc-count/
 |   |-- test/
 |   |   |-- __init__.py
 |   |   |-- test_data.py
@@ -40,8 +37,8 @@ cell-count/
 
 - Download the project:
 ```
-$ git clone https://github.com/nemo256/cell-count
-$ cd cell-count
+$ git clone https://github.com/nemo256/bc-count
+$ cd bc-count
 ```
 - Activate virtual environment:
 ```
@@ -51,7 +48,7 @@ $ pip install -r requirements.txt
 ```
 - Now just run the script:
 ```
-$ python bin/cell-count
+$ python bc-count/main.py
 ```
 
 ## License
