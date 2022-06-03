@@ -11,8 +11,6 @@ Count red, white blood cells to detect various diseases such as blood cancer (le
 ## Project Structure
 ```
 bc-count/
-|-- docs/
-|
 |-- bc-count/
 |   |-- test/
 |   |   |-- __init__.py
@@ -24,6 +22,11 @@ bc-count/
 |   |-- data.py
 |   |-- main.py
 |   |-- model.py
+|
+|-- bin/
+|   |-- bc-count
+|
+|-- docs/
 |
 |-- AUTHORS
 |-- LICENSE

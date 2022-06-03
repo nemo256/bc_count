@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # Setting up
 setup(
     name='bc-count',
-    version='0.0.3',
+    version='0.0.5',
     author='nemo256 (Amine Neggazi)',
     author_email='<neggazimedlamine@gmail.com>',
     description='Count blood cells',
@@ -25,7 +25,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
     ],
-    scripts=['bc-count.py'],
+    scripts=['bin/bc-count'],
     extras_require={
         'testing': ['pytest'],
     }

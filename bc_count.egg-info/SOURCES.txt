@@ -1,7 +1,6 @@
 AUTHORS
 LICENSE
 README.md
-bc-count.py
 setup.py
 bc-count/__init__.py
 bc-count/data.py
@@ -16,3 +15,4 @@ bc_count.egg-info/SOURCES.txt
 bc_count.egg-info/dependency_links.txt
 bc_count.egg-info/requires.txt
 bc_count.egg-info/top_level.txt
+bin/bc-count
