@@ -5,7 +5,7 @@ import os
 # Setting up
 setup(
     name='bc-count',
-    version='0.0.2',
+    version='0.0.3',
     author='nemo256 (Amine Neggazi)',
     author_email='<neggazimedlamine@gmail.com>',
     description='Count blood cells',
