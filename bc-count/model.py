@@ -21,6 +21,8 @@ def conv_bn(filters,
     returns the output after the convolutions.
     '''
     if type == 'transpose':
+        kernel = (2, 2)
+        strides = 2
         conv = tf.keras.layers.Conv2DTranspose(filters, kernel, strides, padding)(model)
     else:
         conv = tf.keras.layers.Conv2D(filters, kernel, strides, padding)(model)
@@ -68,7 +70,7 @@ def do_unet():
     # encoder
     filters = 32
     encoder1 = conv_bn(3*filters, inputs)
-    encoder1 = conv_bn(filters, kernel=(1, 1), encoder1)
+    encoder1 = conv_bn(filters, encoder1, kernel=(1, 1))
     encoder1 = conv_bn(filters, encoder1)
     pool1 = max_pool(encoder1)
 
@@ -83,7 +85,7 @@ def do_unet():
     pool3 = max_pool(encoder3)
 
     filters *= 2
-    encoder4 = conv_bn(filters, pool2)
+    encoder4 = conv_bn(filters, pool3)
     encoder4 = conv_bn(filters, encoder4)
 
     # decoder
@@ -105,8 +107,8 @@ def do_unet():
     decoder3 = conv_bn(filters, decoder3)
     decoder3 = conv_bn(filters, decoder3)
 
-    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(up3)
-    out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(up3)
+    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder3)
+    out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
 
     model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
 
