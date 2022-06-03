@@ -135,7 +135,6 @@ def train_generator(imgs, mask, edge,
                 if ((temp_mask > 0).sum() > 5) is chip_type:
                     continue
 
-            # resize the image chip back to 380 and the mask chip to 196
             temp_chip = cv2.resize(temp_chip,
                                    (input_size, input_size),
                                    interpolation=cv2.INTER_CUBIC)
