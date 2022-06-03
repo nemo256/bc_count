@@ -2,28 +2,25 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.2'
-DESCRIPTION = 'Count blood cells'
-LONG_DESCRIPTION = 'Count red, white blood cells to detect various diseases such as blood cancer (leukemia), lower red blood cells (anemia)...'
-
 # Setting up
 setup(
-    name="vidstream",
-    version=VERSION,
-    author="NeuralNine (Florian Dedov)",
-    author_email="<mail@neuralnine.com>",
-    description=DESCRIPTION,
-    long_description_content_type="text/markdown",
-    long_description=long_description,
+    name='cell-count',
+    version='0.0.2',
+    author='nemo256 (Amine Neggazi)',
+    author_email='<neggazimedlamine@gmail.com>',
+    description='Count blood cells',
+    long_description='Count red, white blood cells to detect various diseases such as blood cancer (leukemia), lower red blood cells (anemia)...',
     packages=find_packages(),
-    install_requires=['opencv-python', 'pyautogui', 'pyaudio'],
-    keywords=['python', 'video', 'stream', 'video stream', 'camera stream', 'sockets'],
+    install_requires=['opencv-python', 'tensorflow', 'numpy'],
+    keywords=['python', 'artificial intelligence', 'deep learning', 'blood cells', 'image segmentation', 'unet'],
     classifiers=[
-        "Development Status :: 1 - Planning",
-        "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3",
-        "Operating System :: Unix",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: Microsoft :: Windows",
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3',
+        'Operating System :: OS Independent',
     ]
+    extras_require={
+        'testing': ['pytest'],
+    }
 )
