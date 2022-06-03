@@ -54,7 +54,7 @@ $ pip install bc-count
 > -o flag is optional (defaults to out/ directory)
 - Count blood cells (-r for red and -w for white):
 ```
-$ bc-count <blood-cell-image>
+$ bc-count -r <blood-cell-image>
 ```
 - Predict blood cell image:
 ```
