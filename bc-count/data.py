@@ -39,6 +39,10 @@ def load_data(img_list, mask_list, edge_list, padding=100):
     mask = load_image_list(mask_list)
     edge = load_image_list(edge_list)
 
+    imgs = clahe_images(imgs)
+    mask = clahe_images(mask)
+    edge = clahe_images(edge)
+
     return preprocess_data(imgs, mask, edge, padding=padding)
 
 
@@ -84,7 +88,7 @@ def train_generator(imgs, mask, edge,
                     padding=100,
                     input_size=188,
                     output_size=100,
-                    skip_empty=False):
+                    skip_empty=True):
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
     while True:
@@ -122,6 +126,10 @@ def train_generator(imgs, mask, edge,
             temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
 
             if skip_empty:
+                if temp_mask.size == 0:
+                    continue
+                if temp_edge.size == 0:
+                    continue
                 if ((temp_mask > 0).sum() > 5) is chip_type:
                     continue
 
@@ -157,9 +165,10 @@ def train_generator(imgs, mask, edge,
             temp_chip -= 1
 
             # later on ... randomly adjust colours
-            yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
-                              (temp_edge > 0).astype(float)[..., np.newaxis])
+            yield temp_chip, ((temp_mask > 0).astype(float)[:,:,0, np.newaxis], 
+                              (temp_edge > 0).astype(float)[:,:,0, np.newaxis])
             break
+
 
 def test_chips(imgs, mask, edge,
                padding=100,
@@ -183,10 +192,16 @@ def test_chips(imgs, mask, edge,
                 temp_edge = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
 
                 temp_chip = temp_chip.astype(np.float32) * 2
-                temp_mask = temp_mask.astype(np.float32) * 2
-                temp_edge = temp_mask.astype(np.float32) * 2
                 temp_chip /= 255
                 temp_chip -= 1
+
+                temp_mask = temp_mask.astype(np.float32) * 2
+                temp_mask /= 255
+                temp_mask -= 1
+
+                temp_edge = temp_edge.astype(np.float32) * 2
+                temp_edge /= 255
+                temp_edge -= 1
 
                 img_chips += [temp_chip]
                 mask_chips += [temp_mask > 0]
