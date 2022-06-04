@@ -397,9 +397,7 @@ def hough_transform(img='edge.png'):
                    np.hstack([img, output]))
 
     # show the hough_transform results
-    print('Hough transform:')
-    print(f'Real count: {len(data.make_polygon_lists(["data/test/Im037_0.json"])[0])}')
-    print(f'Predicted count: {len(circles)}')
+    print(f'Hough transform: {len(circles)}')
 
 
 # count how many cells from the predicted edges
@@ -433,9 +431,7 @@ def component_labeling(img='edge.png'):
                np.hstack([image, output]))
 
     # show number of labels detected
-    print('Connected component labeling:')
-    print(f'Real count: {len(data.make_polygon_lists(["data/test/Im037_0.json"])[0])}')
-    print(f'Predicted count: {num_labels}')
+    print(f'Connected component labeling: {num_labels}')
 
 
 # get a minimal of each cell to help with the counting
@@ -460,6 +456,12 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    # train()
-    # predict()
-    evaluate()
+    # train('wbc')
+    # evaluate(model_name='quadtree_test')
+    # predict(model_name='mse')
+    threshold('mask.png')
+    threshold('edge.png')
+    threshold('edge_mask.png')
+    distance_transform('threshold_edge_mask.png')
+    hough_transform('edge.png')
+    component_labeling('distance_transform.png')
