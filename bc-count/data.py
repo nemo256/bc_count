@@ -40,8 +40,6 @@ def load_data(img_list, mask_list, edge_list, padding=100):
     edge = load_image_list(edge_list)
 
     imgs = clahe_images(imgs)
-    mask = clahe_images(mask)
-    edge = clahe_images(edge)
 
     return preprocess_data(imgs, mask, edge, padding=padding)
 
@@ -91,7 +89,6 @@ def train_generator(imgs, mask, edge,
                     skip_empty=True):
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
-    masks = []
     while True:
         # Select which type of cell to return
         chip_type = np.random.choice([True, False])
@@ -127,12 +124,6 @@ def train_generator(imgs, mask, edge,
             temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
 
             if skip_empty:
-                if temp_chip.size == 0:
-                    continue
-                if temp_mask.size == 0:
-                    continue
-                if temp_edge.size == 0:
-                    continue
                 if ((temp_mask > 0).sum() > 5) is chip_type:
                     continue
 
@@ -166,14 +157,10 @@ def train_generator(imgs, mask, edge,
             temp_chip /= 255
             temp_chip -= 1
 
-            masks += [temp_mask]
-
-            # # later on ... randomly adjust colours
-            # yield temp_chip, ((temp_mask > 0).astype(float)[:,:,0, np.newaxis], 
-            #                   (temp_edge > 0).astype(float)[:,:,0, np.newaxis])
-            # break
-
-    print(len(masks))
+            # later on ... randomly adjust colours
+            yield temp_chip, ((temp_mask > 0).astype(float)[:,:,0, np.newaxis], 
+                              (temp_edge > 0).astype(float)[:,:,0, np.newaxis])
+            break
 
 
 def test_chips(imgs, mask, edge,
