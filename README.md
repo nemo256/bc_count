@@ -37,9 +37,9 @@ bc-count/
 |-- AUTHORS
 |-- LICENSE
 |-- README.md
+|-- TODO.md
 |-- requirements.txt 
 |-- setup.py
-|-- TODO.md
 ```
 
 ## Install
