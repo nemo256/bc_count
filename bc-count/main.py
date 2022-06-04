@@ -18,19 +18,14 @@ output_shape    = (100, 100, 1)
 padding         = [200, 100]
 
 
-def generate_train_dataset(img_list, mask_list, edge_list):
-    img, mask, edge = data.load_data(img_list, mask_list, edge_list)
+def generate_train_dataset(img_list):
+    img, mask, edge = data.load_data(img_list)
 
     def train_gen():
         return data.train_generator(img, mask, edge,
                                     padding=padding[0],
                                     input_size=input_shape[0],
                                     output_size=output_shape[0])
-
-    data.train_generator(img, mask, edge,
-                         padding=padding[0],
-                         input_size=input_shape[0],
-                         output_size=output_shape[0])
 
     # load train dataset to tensorflow for training
     return tf.data.Dataset.from_generator(
@@ -40,8 +35,8 @@ def generate_train_dataset(img_list, mask_list, edge_list):
     )
 
 
-def generate_test_dataset(img_list, mask_list, edge_list):
-    img, mask, edge = data.load_data(img_list, mask_list, edge_list)
+def generate_test_dataset(img_list):
+    img, mask, edge = data.load_data(img_list)
 
     img_chips, mask_chips, edge_chips = data.test_chips(
         img,
@@ -61,8 +56,8 @@ def generate_test_dataset(img_list, mask_list, edge_list):
 def train(model_name='mse', epochs=100):
     # globing appropriate images, their masks and their edges
     if cell_type == 'red':
-        train_img_list = sorted(glob.glob('data/rbc/train/image/*.jpg'))
-        test_img_list = sorted(glob.glob('data/rbc/test/image/*.jpg'))
+        train_img_list = sorted(glob.glob('data/train/*.jpg'))
+        test_img_list = sorted(glob.glob('data/test/*.jpg'))
         train_mask_list = sorted(glob.glob('data/rbc/train/mask/*.jpg'))
         train_edge_list = sorted(glob.glob('data/rbc/train/edge/*.jpg'))
         test_mask_list = sorted(glob.glob('data/rbc/test/mask/*.jpg'))
@@ -81,13 +76,9 @@ def train(model_name='mse', epochs=100):
     # loading train dataset and test datasets
     train_dataset = generate_train_dataset(
         train_img_list,
-        train_mask_list,
-        train_edge_list
     )
     test_dataset = generate_test_dataset(
         test_img_list,
-        test_mask_list,
-        test_edge_list
     )
 
     # initializing the segnet model
