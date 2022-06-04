@@ -18,7 +18,7 @@ def conv_bn(filters,
     :param padding --> model padding (can be valid or same)
     :param type --> to indicate if it is a transpose or normal convolution
 
-    returns the output after the convolutions.
+    :return --> returns the output after the convolutions.
     '''
     if type == 'transpose':
         kernel = (2, 2)
