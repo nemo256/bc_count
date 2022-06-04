@@ -32,8 +32,6 @@ def generate_train_dataset(img_list, mask_list, edge_list):
                          input_size=input_shape[0],
                          output_size=output_shape[0])
 
-    print(chip.shape)
-
     # # load train dataset to tensorflow for training
     # return tf.data.Dataset.from_generator(
     #     train_gen,

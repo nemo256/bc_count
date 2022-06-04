@@ -91,6 +91,7 @@ def train_generator(imgs, mask, edge,
                     skip_empty=True):
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
+    masks = []
     while True:
         # Select which type of cell to return
         chip_type = np.random.choice([True, False])
@@ -165,10 +166,14 @@ def train_generator(imgs, mask, edge,
             temp_chip /= 255
             temp_chip -= 1
 
-            # later on ... randomly adjust colours
-            yield temp_chip, ((temp_mask > 0).astype(float)[:,:,0, np.newaxis], 
-                              (temp_edge > 0).astype(float)[:,:,0, np.newaxis])
-            break
+            masks += [temp_mask]
+
+            # # later on ... randomly adjust colours
+            # yield temp_chip, ((temp_mask > 0).astype(float)[:,:,0, np.newaxis], 
+            #                   (temp_edge > 0).astype(float)[:,:,0, np.newaxis])
+            # break
+
+    print(len(masks))
 
 
 def test_chips(imgs, mask, edge,
