@@ -5,5 +5,7 @@
 - [ ] Train and test white blood cells
 - [ ] Train and test red blood cells
 - [ ] Train and test platelets
+- [ ] Add unit tests
+- [ ] Finish documentation for all functions
 - [x] Publish this project to PyPI.
 - [x] Publish a stable python script to PyPI.
