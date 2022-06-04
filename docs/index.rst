@@ -1,5 +1,5 @@
 .. bc-count documentation master file, created by
-   sphinx-quickstart on Fri Jun  3 18:08:53 2022.
+   sphinx-quickstart on Sat Jun  4 22:09:20 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -10,7 +10,9 @@ Welcome to bc-count's documentation!
    :maxdepth: 4
    :caption: Contents:
 
-   bc-count
+   data
+   main
+   model
 
 
 Indices and tables
