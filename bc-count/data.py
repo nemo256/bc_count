@@ -6,10 +6,17 @@ import numpy as np
 from tensorflow import keras
 
 
-def load_image_list(img_files):
+def load_image_list(img_files, gray=False):
     imgs = []
-    for image_file in img_files:
-        imgs += [cv2.imread(image_file)]
+    if gray:
+        for image_file in img_files:
+            img = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)
+            img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
+            imgs += [img]
+
+    else:
+        for image_file in img_files:
+            imgs += [cv2.imread(image_file)]
     return imgs
 
 
@@ -23,84 +30,30 @@ def clahe_images(img_list):
     return img_list
 
 
-def get_label(word):
-    words_to_numerical_labels_dict = {
-        'None': 0,
-        'Truck': 1,
-        'Tanker': 2,
-        'Trailer': 3
-    }
-    return words_to_numerical_labels_dict[word]
-
-
-def make_polygon_lists(markup_files):
-    marked_dicts = []
-    for file_name in markup_files:
-        if os.path.isfile(file_name):
-            with open(file_name, 'r') as markup_file:
-                marked_dicts += [json.load(markup_file)]
-
-    polygon_lists_list = []
-    for marked_dict in marked_dicts:
-        polygon_list = []
-
-        for poly in marked_dict['markup']:
-            vertex_list = []
-
-            for vertex in poly['vertices']:
-                vertex_list += [(vertex['x'], vertex['y'])]
-            polygon_list += [(vertex_list, get_label(poly['object_label']))]
-
-        polygon_lists_list += [polygon_list]
-
-    return polygon_lists_list
-
-
-def rasterise_markup(polygon_lists_list, imgs, edge_size=None):
-    markups = [np.zeros(img.shape[:2]) for img in imgs]
-    if edge_size is not None:
-        edges = [np.zeros(img.shape[:2]) for img in imgs]
-
-    for i, polygon_list in enumerate(polygon_lists_list):
-        for ver, col in polygon_list:
-            ver = np.array([ver,])
-            cv2.fillPoly(markups[i], ver, col)
-            if edge_size is not None:
-                cv2.polylines(edges[i], ver, True, col, edge_size)
-
-    if edge_size is not None:
-        return markups, edges
-
-    return markups
-
-
-def load_markup(markup_files, imgs, edge_size=2):
-    polygon_list = make_polygon_lists(markup_files)
-
-    mask, edge = rasterise_markup(polygon_list, imgs, edge_size=edge_size)
-    mask = [markup.astype(np.uint8) for markup in mask]
-    edge = [markup.astype(np.uint8) for markup in edge]
-
-    return mask, edge
-
-
-def preprocess_data(imgs, mask, edge, padding=100):
+def preprocess_data(imgs, mask, edge=None, padding=100):
     imgs = [np.pad(img, ((padding, padding),
                          (padding, padding), (0, 0)), mode='constant') for img in imgs]
     mask = [np.pad(mask, ((padding, padding),
                           (padding, padding)), mode='constant') for mask in mask]
-    edge = [np.pad(edge, ((padding, padding),
-                          (padding, padding)), mode='constant') for edge in edge]
+    if edge is not None:
+        edge = [np.pad(edge, ((padding, padding),
+                              (padding, padding)), mode='constant') for edge in edge]
 
-    return imgs, mask, edge
+    if edge is not None:
+        return imgs, mask, edge
+
+    return imgs, mask
 
 
-def load_data(img_list, edge_size=2, padding=100):
+def load_data(img_list, mask_list, edge_list=None, padding=100):
     imgs = load_image_list(img_list)
     imgs = clahe_images(imgs)
 
-    markup_list = [f.split('.')[0] + '.json' for f in img_list]
-    mask, edge = load_markup(markup_list, imgs, edge_size=edge_size)
+    mask = load_image_list(mask_list, gray=True)
+    if edge_list:
+        edge = load_image_list(edge_list, gray=True)
+    else:
+        edge = None
 
     return preprocess_data(imgs, mask, edge, padding=padding)
 
@@ -151,14 +104,14 @@ def train_generator(imgs, mask, edge,
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
     while True:
-        # Select which type of cell to return
+        # select which type of cell to return
         chip_type = np.random.choice([True, False])
 
         while True:
-            # Pick random image
+            # pick random image
             i = np.random.randint(len(imgs))
 
-            # Pick random central location in the image (200 + 196/2)
+            # pick random central location in the image (200 + 196/2)
             center_offset = padding + (output_size / 2)
             x = np.random.randint(center_offset, imgs[i].shape[0] - center_offset)
             y = np.random.randint(center_offset, imgs[i].shape[1] - center_offset)
@@ -212,6 +165,9 @@ def train_generator(imgs, mask, edge,
                 temp_edge = np.flip(temp_edge, axis=1)
 
             # randomly luminosity augment
+            temp_chip = aug_lum(temp_chip)
+
+            # randomly augment chip
             temp_chip = aug_img(temp_chip)
 
             # rescale the image

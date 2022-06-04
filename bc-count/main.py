@@ -18,8 +18,8 @@ output_shape    = (100, 100, 1)
 padding         = [200, 100]
 
 
-def generate_train_dataset(img_list):
-    img, mask, edge = data.load_data(img_list)
+def generate_train_dataset(img_list, mask_list, edge_list):
+    img, mask, edge = data.load_data(img_list, mask_list, edge_list)
 
     def train_gen():
         return data.train_generator(img, mask, edge,
@@ -35,8 +35,8 @@ def generate_train_dataset(img_list):
     )
 
 
-def generate_test_dataset(img_list):
-    img, mask, edge = data.load_data(img_list)
+def generate_test_dataset(img_list, mask_list, edge_list):
+    img, mask, edge = data.load_data(img_list, mask_list, edge_list)
 
     img_chips, mask_chips, edge_chips = data.test_chips(
         img,
@@ -63,50 +63,56 @@ def train(model_name='mse', epochs=100):
         test_mask_list = sorted(glob.glob('data/rbc/test/mask/*.jpg'))
         test_edge_list = sorted(glob.glob('data/rbc/test/edge/*.jpg'))
     elif cell_type == 'white':
-        train_img_list = glob.glob('data/wbc/train/image/*.jpg')
-        test_img_list = glob.glob('data/wbc/test/image/*.jpg')
-        train_mask_list = glob.glob('data/wbc/train/mask/*.jpg')
-        train_edge_list = glob.glob('data/wbc/train/edge/*.jpg')
-        test_mask_list = glob.glob('data/wbc/test/mask/*.jpg')
-        test_edge_list = glob.glob('data/wbc/test/edge/*.jpg')
+        train_img_list = sorted(glob.glob('data/wbc/train/image/*.jpg'))
+        test_img_list = sorted(glob.glob('data/wbc/test/image/*.jpg'))
+        train_mask_list = sorted(glob.glob('data/wbc/train/mask/*.jpg'))
+        train_edge_list = sorted(glob.glob('data/wbc/train/edge/*.jpg'))
+        test_mask_list = sorted(glob.glob('data/wbc/test/mask/*.jpg'))
+        test_edge_list = sorted(glob.glob('data/wbc/test/edge/*.jpg'))
     else:
         train_mask_list = None
         test_mask_list = None
 
-    # loading train dataset and test datasets
-    train_dataset = generate_train_dataset(
-        train_img_list,
-    )
-    test_dataset = generate_test_dataset(
-        test_img_list,
-    )
+    print(len(train_mask_list))
 
-    # initializing the segnet model
-    model = do_unet()
+    # # loading train dataset and test datasets
+    # train_dataset = generate_train_dataset(
+    #     train_img_list,
+    #     train_mask_list,
+    #     train_edge_list,
+    # )
+    # test_dataset = generate_test_dataset(
+    #     test_img_list,
+    #     test_mask_list,
+    #     test_edge_list,
+    # )
 
-    # create models directory if it does not exist
-    if not os.path.exists('models/'):
-        os.makedirs('models/')
+    # # initializing the segnet model
+    # model = do_unet()
 
-    # Check for existing weights
-    if os.path.exists(f'models/{model_name}.h5'):
-        model.load_weights(f'models/{model_name}.h5')
+    # # create models directory if it does not exist
+    # if not os.path.exists('models/'):
+    #     os.makedirs('models/')
 
-    # fitting the model
-    history = model.fit(
-        train_dataset.batch(8),
-        validation_data=test_dataset.batch(8),
-        epochs=epochs,
-        steps_per_epoch=1,
-        max_queue_size=16,
-        use_multiprocessing=True,
-        workers=8,
-        verbose=1,
-        callbacks=get_callbacks(model_name)
-    )
+    # # Check for existing weights
+    # if os.path.exists(f'models/{model_name}.h5'):
+    #     model.load_weights(f'models/{model_name}.h5')
 
-    # save the history
-    np.save(f'models/{model_name}_history.npy', history.history)
+    # # fitting the model
+    # history = model.fit(
+    #     train_dataset.batch(8),
+    #     validation_data=test_dataset.batch(8),
+    #     epochs=epochs,
+    #     steps_per_epoch=1,
+    #     max_queue_size=16,
+    #     use_multiprocessing=True,
+    #     workers=8,
+    #     verbose=1,
+    #     callbacks=get_callbacks(model_name)
+    # )
+
+    # # save the history
+    # np.save(f'models/{model_name}_history.npy', history.history)
 
 
 if __name__ == '__main__':
