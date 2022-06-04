@@ -135,7 +135,8 @@ def train_generator(imgs, mask, edge,
             # take a slice of the image and mask accordingly
             temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
             temp_mask = mask[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
-            temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+            if edge is not None:
+                temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
 
             if skip_empty:
                 if ((temp_mask > 0).sum() > 5) is chip_type:
@@ -148,21 +149,24 @@ def train_generator(imgs, mask, edge,
             temp_mask = cv2.resize(temp_mask,
                                    (output_size, output_size),
                                    interpolation=cv2.INTER_NEAREST)
-            temp_edge = cv2.resize(temp_edge,
-                                   (output_size, output_size),
-                                   interpolation=cv2.INTER_NEAREST)
+            if edge is not None:
+                temp_edge = cv2.resize(temp_edge,
+                                       (output_size, output_size),
+                                       interpolation=cv2.INTER_NEAREST)
 
             # randomly rotate (like below)
             rot = np.random.randint(4)
             temp_chip = np.rot90(temp_chip, k=rot, axes=(0, 1))
             temp_mask = np.rot90(temp_mask, k=rot, axes=(0, 1))
-            temp_edge = np.rot90(temp_edge, k=rot, axes=(0, 1))
+            if edge is not None:
+                temp_edge = np.rot90(temp_edge, k=rot, axes=(0, 1))
 
             # randomly flip
             if np.random.random() > 0.5:
                 temp_chip = np.flip(temp_chip, axis=1)
                 temp_mask = np.flip(temp_mask, axis=1)
-                temp_edge = np.flip(temp_edge, axis=1)
+                if edge is not None:
+                    temp_edge = np.flip(temp_edge, axis=1)
 
             # randomly luminosity augment
             temp_chip = aug_lum(temp_chip)
@@ -176,8 +180,11 @@ def train_generator(imgs, mask, edge,
             temp_chip -= 1
 
             # later on ... randomly adjust colours
-            yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
-                              (temp_edge > 0).astype(float)[..., np.newaxis])
+            if edge is not None:
+                yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
+                                  (temp_edge > 0).astype(float)[..., np.newaxis])
+            else:
+                yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
             break
 
 
