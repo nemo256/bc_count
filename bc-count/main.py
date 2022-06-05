@@ -12,7 +12,7 @@ import data
 from model import do_unet, get_callbacks
 
 
-def train(model_name='mse', epochs=100):
+def train(model_name='mse', epochs=500):
     # globing appropriate images, their masks and their edges
     if cell_type == 'red':
         train_img_list = sorted(glob.glob('data/rbc/train/image/*.jpg'))
