@@ -12,39 +12,6 @@ import data
 from model import do_unet, get_callbacks
 
 
-
-
-def generate_test_dataset(img_list, mask_list, edge_list=None):
-    if cell_type == 'red':
-        img, mask, edge = data.load_data(img_list, mask_list, edge_list)
-    elif cell_type == 'white':
-        img, mask = data.load_data(img_list, mask_list, edge_list)
-        edge = None
-
-    if cell_type == 'red':
-        def test_gen():
-    elif cell_type == 'white':
-        def test_gen():
-            return data.test_chips(img, mask,
-                                   padding=padding[0],
-                                   input_size=input_shape[0],
-                                   output_size=output_shape[0])
-
-    # load train dataset to tensorflow for training
-    if cell_type == 'red':
-        return tf.data.Dataset.from_generator(
-            test_gen,
-            (tf.float64, ((tf.float64), (tf.float64))),
-            (input_shape, (output_shape, output_shape))
-        )
-    elif cell_type == 'white':
-        return tf.data.Dataset.from_generator(
-            test_gen,
-            (tf.float64, (tf.float64)),
-            (input_shape, (output_shape))
-        )
-
-
 def train(model_name='mse', epochs=100):
     # globing appropriate images, their masks and their edges
     if cell_type == 'red':
