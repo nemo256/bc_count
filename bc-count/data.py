@@ -220,7 +220,8 @@ def test_chips(imgs, mask,
                 temp_chip -= 1
 
                 if edge is not None:
-                    yield temp_chip, temp_mask, temp_edge
+                    yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
+                                      (temp_edge > 0).astype(float)[..., np.newaxis])
                 else:
-                    yield temp_chip, temp_mask
+                    yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
                 break
