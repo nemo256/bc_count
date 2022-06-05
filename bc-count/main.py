@@ -120,10 +120,11 @@ def train(model_name='mse', epochs=100):
             train_img_list,
             train_mask_list,
         )
-        test_dataset = generate_test_dataset(
-            test_img_list,
-            test_mask_list,
-        )
+        for i in len(test_img_list):
+            test_dataset += [generate_test_dataset(test_img_list[i],
+                                                   test_mask_list[i])]
+
+    print(len(test_dataset))
 
     # # initializing the do_unet model
     # model = do_unet()
