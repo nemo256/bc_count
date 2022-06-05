@@ -7,21 +7,15 @@ import matplotlib.pyplot as plt
 from scipy import ndimage
 
 # custom imports
+from config import *
 import data
 from model import do_unet, get_callbacks
 
 
-# global variables
-cell_type       = 'white'              # red, white or platelets
-input_shape     = (188, 188, 3)
-output_shape    = (100, 100, 1)
-padding         = [200, 100]
-
-
 def generate_train_dataset(img_list, mask_list, edge_list):
-    if edge_list:
+    if cell_type == 'red':
         img, mask, edge = data.load_data(img_list, mask_list, edge_list)
-    else:
+    elif cell_type == 'white':
         img, mask = data.load_data(img_list, mask_list, edge_list)
         edge = None
 
@@ -33,13 +27,13 @@ def generate_train_dataset(img_list, mask_list, edge_list):
                                     output_size=output_shape[0])
 
     # load train dataset to tensorflow for training
-    if edge is not None:
+    if cell_type == 'red':
         return tf.data.Dataset.from_generator(
             train_gen,
             (tf.float64, ((tf.float64), (tf.float64))),
             (input_shape, (output_shape, output_shape))
         )
-    else:
+    elif cell_type == 'white':
         return tf.data.Dataset.from_generator(
             train_gen,
             (tf.float64, (tf.float64)),
@@ -48,13 +42,13 @@ def generate_train_dataset(img_list, mask_list, edge_list):
 
 
 def generate_test_dataset(img_list, mask_list, edge_list):
-    if edge_list:
+    if cell_type == 'red':
         img, mask, edge = data.load_data(img_list, mask_list, edge_list)
-    else:
+    elif cell_type == 'white':
         img, mask = data.load_data(img_list, mask_list, edge_list)
         edge = None
 
-    if edge:
+    if cell_type == 'red':
         img_chips, mask_chips, edge_chips = data.test_chips(
             img,
             mask,
@@ -63,7 +57,7 @@ def generate_test_dataset(img_list, mask_list, edge_list):
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
-    else:
+    elif cell_type == 'white':
         img_chips, mask_chips = data.test_chips(
             img,
             mask,
@@ -214,7 +208,7 @@ def predict(img='Im037_0',
         model.load_weights(f'models/{model_name}.h5')
 
     # load test data
-    if test_edge is not None:
+    if cell_type == 'red':
         img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
 
         img_chips, mask_chips, edge_chips = data.test_chips(
@@ -225,7 +219,7 @@ def predict(img='Im037_0',
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
-    else:
+    elif cell_type == 'white':
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
         img_chips, mask_chips = data.test_chips(
@@ -237,52 +231,81 @@ def predict(img='Im037_0',
         )
 
     # segment all image chips
-    output = model.predict(img_chips)
-    new_mask_chips = np.array(output[0])
-    new_edge_chips = np.array(output[1])
+    if cell_type == 'red':
+        output = model.predict(img_chips)
+        new_mask_chips = np.array(output[0])
+        new_edge_chips = np.array(output[1])
+    elif cell_type == 'white':
+        output = model.predict(img_chips)
+        new_mask_chips = np.array(output)
 
     # get image dimensions
     dimensions = [get_sizes(img)[0][0], get_sizes(img)[0][1]]
 
     # reshape chips arrays to be concatenated
-    new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
-    new_edge_chips = reshape(new_edge_chips, dimensions[0], dimensions[1])
+    if cell_type == 'red':
+        new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
+        new_edge_chips = reshape(new_edge_chips, dimensions[0], dimensions[1])
+    elif cell_type == 'white':
+        new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
 
     # get rid of none necessary dimension
-    new_mask_chips = np.squeeze(new_mask_chips)
-    new_edge_chips = np.squeeze(new_edge_chips)
+    if cell_type == 'red':
+        new_mask_chips = np.squeeze(new_mask_chips)
+        new_edge_chips = np.squeeze(new_edge_chips)
+    elif cell_type == 'white':
+        new_mask_chips = np.squeeze(new_mask_chips)
 
     # concatenate chips into a single image (mask and edge)
-    new_mask = concat(new_mask_chips)
-    new_edge = concat(new_edge_chips)
+    if cell_type == 'red':
+        new_mask = concat(new_mask_chips)
+        new_edge = concat(new_edge_chips)
+    elif cell_type == 'white':
+        new_mask = concat(new_mask_chips)
     
     # create output directory if it does not exist
     if not os.path.exists('output/'):
         os.makedirs('output/')
 
     # save predicted mask and edge
-    plt.imsave('output/mask.png', new_mask)
-    plt.imsave('output/edge.png', new_edge)
-    plt.imsave('output/edge_mask.png', new_mask - new_edge)
+    if cell_type == 'red':
+        plt.imsave('output/mask.png', new_mask)
+        plt.imsave('output/edge.png', new_edge)
+        plt.imsave('output/edge_mask.png', new_mask - new_edge)
+    elif cell_type == 'white':
+        plt.imsave('output/mask.png', new_mask)
 
     # organize results into one figure
-    fig = plt.figure(figsize=(25, 12), dpi=80)
-    fig.subplots_adjust(hspace=0.1, wspace=0.1)
-    ax  = fig.add_subplot(2, 3, 1)
-    ax.set_title('Test image')
-    ax.imshow(np.array(img)[0,:,:,:])
-    ax  = fig.add_subplot(2, 3, 2)
-    ax.set_title('Test mask')
-    ax.imshow(np.array(mask)[0,:,:])
-    ax  = fig.add_subplot(2, 3, 3)
-    ax.set_title('Test edge')
-    ax.imshow(np.array(edge)[0,:,:])
-    ax  = fig.add_subplot(2, 3, 5)
-    ax.set_title('Predicted mask')
-    ax.imshow(new_mask)
-    ax  = fig.add_subplot(2, 3, 6)
-    ax.set_title('Predicted edge')
-    ax.imshow(new_edge)
+    if cell_type == 'red':
+        fig = plt.figure(figsize=(25, 12), dpi=80)
+        fig.subplots_adjust(hspace=0.1, wspace=0.1)
+        ax  = fig.add_subplot(2, 3, 1)
+        ax.set_title('Test image')
+        ax.imshow(np.array(img)[0,:,:,:])
+        ax  = fig.add_subplot(2, 3, 2)
+        ax.set_title('Test mask')
+        ax.imshow(np.array(mask)[0,:,:])
+        ax  = fig.add_subplot(2, 3, 3)
+        ax.set_title('Test edge')
+        ax.imshow(np.array(edge)[0,:,:])
+        ax  = fig.add_subplot(2, 3, 5)
+        ax.set_title('Predicted mask')
+        ax.imshow(new_mask)
+        ax  = fig.add_subplot(2, 3, 6)
+        ax.set_title('Predicted edge')
+        ax.imshow(new_edge)
+    elif cell_type == 'white':
+        fig = plt.figure(figsize=(25, 12), dpi=80)
+        fig.subplots_adjust(hspace=0.1, wspace=0.1)
+        ax  = fig.add_subplot(2, 2, 1)
+        ax.set_title('Test image')
+        ax.imshow(np.array(img)[0,:,:,:])
+        ax  = fig.add_subplot(2, 2, 2)
+        ax.set_title('Test mask')
+        ax.imshow(np.array(mask)[0,:,:])
+        ax  = fig.add_subplot(2, 2, 4)
+        ax.set_title('Predicted mask')
+        ax.imshow(new_mask)
 
     # save the figure as a sample output
     plt.savefig('sample.png')
@@ -314,7 +337,7 @@ def evaluate(model_name='mse'):
         train(model_name)
 
     # load test data
-    if test_edge_list is not None:
+    if cell_type == 'red':
         img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
 
         img_chips, mask_chips, edge_chips = data.test_chips(
@@ -325,7 +348,7 @@ def evaluate(model_name='mse'):
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
-    else:
+    elif cell_type == 'white':
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
         img_chips, mask_chips = data.test_chips(
@@ -337,10 +360,10 @@ def evaluate(model_name='mse'):
         )
 
     # print the evaluated accuracies
-    if test_edge_list is not None:
+    if cell_type == 'red':
         print(model.evaluate(img_chips, (mask_chips, edge_chips)))
     else:
-        print(model.evaluate(img_chips, (mask_chips, None)))
+        print(model.evaluate(img_chips, (mask_chips)))
 
 
 # threshold an image using otsu's threshold

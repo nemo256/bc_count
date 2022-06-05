@@ -1,6 +1,9 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
 
+# custom imports
+from config import *
+
 
 def conv_bn(filters,
             model,
@@ -108,9 +111,14 @@ def do_unet():
     decoder3 = conv_bn(filters, decoder3)
 
     out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder3)
-    out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
 
-    model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
+    if cell_type == 'red':
+        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
+        model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
+
+    else: 
+        model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
+
 
     opt = tf.optimizers.Adam(learning_rate=0.0001)
 

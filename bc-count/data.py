@@ -5,6 +5,9 @@ import cv2
 import numpy as np
 from tensorflow import keras
 
+# custom imports
+from config import *
+
 
 def load_image_list(img_files, gray=False):
     imgs = []
@@ -30,7 +33,7 @@ def clahe_images(img_list):
     return img_list
 
 
-def preprocess_data(imgs, mask, edge=None, padding=100):
+def preprocess_data(imgs, mask, edge=None, padding=padding[1]):
     imgs = [np.pad(img, ((padding, padding),
                          (padding, padding), (0, 0)), mode='constant') for img in imgs]
     mask = [np.pad(mask, ((padding, padding),
@@ -97,7 +100,7 @@ def aug_img(image):
 
 def train_generator(imgs, mask, edge,
                     scale_range=None,
-                    padding=100,
+                    padding=padding[1],
                     input_size=188,
                     output_size=100,
                     skip_empty=False):
@@ -190,7 +193,7 @@ def train_generator(imgs, mask, edge,
 
 def test_chips(imgs, mask,
                edge=None,
-               padding=100,
+               padding=padding[1],
                input_size=188,
                output_size=100):
     img_chips = []
