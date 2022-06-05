@@ -411,9 +411,9 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    # train('rbc')
+    train('rbc')
     # evaluate(model_name='quadtree_test')
-    predict()
+    # predict()
     # threshold('mask.png')
 
     # if cell_type == 'rbc':
