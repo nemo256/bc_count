@@ -48,7 +48,7 @@ def preprocess_data(imgs, mask, edge=None, padding=padding[1]):
     return imgs, mask
 
 
-def load_data(img_list, mask_list, edge_list=None, padding=100):
+def load_data(img_list, mask_list, edge_list=None, padding=padding[1]):
     imgs = load_image_list(img_list)
     imgs = clahe_images(imgs)
 

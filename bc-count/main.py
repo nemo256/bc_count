@@ -12,7 +12,7 @@ import data
 from model import do_unet, get_callbacks
 
 
-def generate_train_dataset(img_list, mask_list, edge_list):
+def generate_train_dataset(img_list, mask_list, edge_list=None):
     if cell_type == 'red':
         img, mask, edge = data.load_data(img_list, mask_list, edge_list)
     elif cell_type == 'white':
@@ -48,7 +48,7 @@ def generate_train_dataset(img_list, mask_list, edge_list):
         )
 
 
-def generate_test_dataset(img_list, mask_list, edge_list):
+def generate_test_dataset(img_list, mask_list, edge_list=None):
     if cell_type == 'red':
         img, mask, edge = data.load_data(img_list, mask_list, edge_list)
     elif cell_type == 'white':
@@ -107,16 +107,26 @@ def train(model_name='mse', epochs=100):
         return False
 
     # loading train dataset and test datasets
-    train_dataset = generate_train_dataset(
-        train_img_list,
-        train_mask_list,
-        train_edge_list,
-    )
-    test_dataset = generate_test_dataset(
-        test_img_list,
-        test_mask_list,
-        test_edge_list,
-    )
+    if cell_type == 'red':
+        train_dataset = generate_train_dataset(
+            train_img_list,
+            train_mask_list,
+            train_edge_list,
+        )
+        test_dataset = generate_test_dataset(
+            test_img_list,
+            test_mask_list,
+            test_edge_list,
+        )
+    elif cell_type == 'white':
+        train_dataset = generate_train_dataset(
+            train_img_list,
+            train_mask_list,
+        )
+        test_dataset = generate_test_dataset(
+            test_img_list,
+            test_mask_list,
+        )
 
     # initializing the do_unet model
     model = do_unet()
@@ -134,7 +144,7 @@ def train(model_name='mse', epochs=100):
         train_dataset.batch(8),
         validation_data=test_dataset.batch(8),
         epochs=epochs,
-        steps_per_epoch=125,
+        steps_per_epoch=1,
         max_queue_size=16,
         use_multiprocessing=True,
         workers=8,
@@ -206,7 +216,7 @@ def predict(img='Im037_0',
         test_edge = sorted(glob.glob(f'data/rbc/test/edge/{img}_RE.jpg'))
     elif cell_type == 'white':
         test_img = sorted(glob.glob(f'data/wbc/test/image/{img}.jpg'))
-        test_mask = sorted(glob.glob(f'data/rbc/test/mask/{img}_W.jpg'))
+        test_mask = sorted(glob.glob(f'data/wbc/test/mask/{img}_W.jpg'))
         test_edge = None
     else:
         return False
