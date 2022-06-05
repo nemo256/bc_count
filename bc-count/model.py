@@ -115,16 +115,20 @@ def do_unet():
     if cell_type == 'red':
         out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
-
-    else: 
+    elif cell_type == 'white':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
 
 
     opt = tf.optimizers.Adam(learning_rate=0.0001)
 
-    model.compile(loss='mse',
-                  loss_weights=[0.1, 0.9],
-                  optimizer=opt,
-                  metrics='accuracy')
+    if cell_type == 'red':
+        model.compile(loss='mse',
+                      loss_weights=[0.1, 0.9],
+                      optimizer=opt,
+                      metrics='accuracy')
+    elif cell_type == 'white':
+        model.compile(loss='mse',
+                      optimizer=opt,
+                      metrics='accuracy')
 
     return model
