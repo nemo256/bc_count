@@ -102,8 +102,8 @@ def aug_img(image):
 def train_generator(imgs, mask, edge=None,
                     scale_range=None,
                     padding=padding[1],
-                    input_size=188,
-                    output_size=100,
+                    input_size=input_shape[0],
+                    output_size=output_shape[0],
                     skip_empty=False):
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
@@ -195,8 +195,8 @@ def train_generator(imgs, mask, edge=None,
 def test_chips(imgs, mask,
                edge=None,
                padding=padding[1],
-               input_size=188,
-               output_size=100):
+               input_size=input_shape[0],
+               output_size=output_shape[0]):
     center_offset = padding + (output_size / 2)
     for i, _ in enumerate(imgs):
         for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
@@ -226,6 +226,55 @@ def test_chips(imgs, mask,
                 else:
                     yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
                 break
+
+
+def slice(imgs, mask,
+          edge=None,
+          padding=100,
+          input_size=188,
+          output_size=100):
+    img_chips = []
+    mask_chips = []
+    if edge is not None:
+        edge_chips = []
+
+    center_offset = padding + (output_size / 2)
+    for i, _ in enumerate(imgs):
+        for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
+            for y in np.arange(center_offset, imgs[i].shape[1] - input_size / 2, output_size):
+                chip_x_l = int(x - (input_size / 2))
+                chip_x_r = int(x + (input_size / 2))
+                chip_y_l = int(y - (input_size / 2))
+                chip_y_r = int(y + (input_size / 2))
+
+                mask_x_l = int(x - (output_size / 2))
+                mask_x_r = int(x + (output_size / 2))
+                mask_y_l = int(y - (output_size / 2))
+                mask_y_r = int(y + (output_size / 2))
+
+                temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
+                temp_mask = mask[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+                if edge is not None:
+                    temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+
+                temp_chip = temp_chip.astype(np.float32) * 2
+                temp_chip /= 255
+                temp_chip -= 1
+
+                img_chips += [temp_chip]
+                mask_chips += [(temp_mask > 0).astype(float)[..., np.newaxis]]
+                if edge is not None:
+                    edge_chips += [(temp_edge > 0).astype(float)[..., np.newaxis]]
+
+    img_chips = np.array(img_chips)
+    mask_chips = np.array(mask_chips)
+    if edge is not None:
+        edge_chips = np.array(edge_chips)
+
+    if edge is not None:
+        return img_chips, mask_chips, edge_chips
+
+    return img_chips, mask_chips
 
 
 def generator(img_list, mask_list, edge_list=None, type='train'):

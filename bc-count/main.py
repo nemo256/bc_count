@@ -136,16 +136,17 @@ def denoise(img):
 
 
 # predict (segment) image and save a sample output
-def predict(img='Im037_0',
-            model_name='mse'):
+def predict(img='Im037_0'):
     '''
     Predict (segment) blood cell images using the trained model (do_unet)
     '''
     if cell_type == 'red':
+        model_name = 'rbc'
         test_img = sorted(glob.glob(f'data/rbc/test/image/{img}.jpg'))
         test_mask = sorted(glob.glob(f'data/rbc/test/mask/{img}_R.jpg'))
         test_edge = sorted(glob.glob(f'data/rbc/test/edge/{img}_RE.jpg'))
     elif cell_type == 'white':
+        model_name = 'wbc'
         test_img = sorted(glob.glob(f'data/wbc/test/image/{img}.jpg'))
         test_mask = sorted(glob.glob(f'data/wbc/test/mask/{img}_W.jpg'))
         test_edge = None
@@ -163,23 +164,23 @@ def predict(img='Im037_0',
     if cell_type == 'red':
         img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
 
-        img_chips, mask_chips, edge_chips = data.test_chips(
+        img_chips, mask_chips, edge_chips = data.slice(
             img,
             mask,
             edge,
             padding=padding[1],
             input_size=input_shape[0],
-            output_size=output_shape[0]
+            output_size=output_shape[0],
         )
     elif cell_type == 'white':
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
-        img_chips, mask_chips = data.test_chips(
+        img_chips, mask_chips = data.slice(
             img,
             mask,
             padding=padding[1],
             input_size=input_shape[0],
-            output_size=output_shape[0]
+            output_size=output_shape[0],
         )
 
     # segment all image chips
@@ -215,17 +216,23 @@ def predict(img='Im037_0',
     elif cell_type == 'white':
         new_mask = concat(new_mask_chips)
     
-    # create output directory if it does not exist
+    # create output directories if it does not exist
     if not os.path.exists('output/'):
         os.makedirs('output/')
 
+    if not os.path.exists('output/rbc'):
+        os.makedirs('output/rbc')
+
+    if not os.path.exists('output/wbc'):
+        os.makedirs('output/wbc')
+
     # save predicted mask and edge
     if cell_type == 'red':
-        plt.imsave('output/mask.png', new_mask)
-        plt.imsave('output/edge.png', new_edge)
-        plt.imsave('output/edge_mask.png', new_mask - new_edge)
+        plt.imsave('output/rbc/mask.png', new_mask)
+        plt.imsave('output/rbc/edge.png', new_edge)
+        plt.imsave('output/rbc/edge_mask.png', new_mask - new_edge)
     elif cell_type == 'white':
-        plt.imsave('output/mask.png', new_mask)
+        plt.imsave('output/wbc/mask.png', new_mask)
 
     # organize results into one figure
     if cell_type == 'red':
@@ -431,9 +438,9 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    train('wbc')
+    # train('wbc')
     # evaluate(model_name='quadtree_test')
-    # predict(model_name='mse')
+    predict()
     # threshold('mask.png')
     # threshold('edge.png')
     # threshold('edge_mask.png')
