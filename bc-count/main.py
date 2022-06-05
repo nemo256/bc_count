@@ -19,7 +19,6 @@ def generate_train_dataset(img_list, mask_list, edge_list=None):
         img, mask = data.load_data(img_list, mask_list, edge_list)
         edge = None
 
-
     if cell_type == 'red':
         def train_gen():
             return data.train_generator(img, mask, edge,
