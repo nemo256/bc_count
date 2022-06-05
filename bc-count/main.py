@@ -434,7 +434,6 @@ def distance_transform(img='threshold_edge_mask.png'):
     plt.imsave(f'{output_directory}/distance_transform.png', img, cmap='gray')
 
 
-
 if __name__ == '__main__':
     train('rbc')
     # evaluate(model_name='quadtree_test')
