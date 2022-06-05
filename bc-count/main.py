@@ -14,51 +14,33 @@ from model import do_unet, get_callbacks
 
 def train(model_name='mse', epochs=500):
     # globing appropriate images, their masks and their edges
-    if cell_type == 'red':
-        train_img_list = sorted(glob.glob('data/rbc/train/image/*.jpg'))
-        test_img_list = sorted(glob.glob('data/rbc/test/image/*.jpg'))
-        train_mask_list = sorted(glob.glob('data/rbc/train/mask/*.jpg'))
-        test_mask_list = sorted(glob.glob('data/rbc/test/mask/*.jpg'))
-        train_edge_list = sorted(glob.glob('data/rbc/train/edge/*.jpg'))
-        test_edge_list = sorted(glob.glob('data/rbc/test/edge/*.jpg'))
-    elif cell_type == 'white':
-        train_img_list = sorted(glob.glob('data/wbc/train/image/*.jpg'))
-        test_img_list = sorted(glob.glob('data/wbc/test/image/*.jpg'))
-        train_mask_list = sorted(glob.glob('data/wbc/train/mask/*.jpg'))
-        test_mask_list = sorted(glob.glob('data/wbc/test/mask/*.jpg'))
+    train_img_list = sorted(glob.glob(f'data/{cell_type}/train/image/*.jpg'))
+    test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
+    train_mask_list = sorted(glob.glob(f'data/{cell_type}/train/mask/*.jpg'))
+    test_mask_list = sorted(glob.glob(f'data/{cell_type}/test/mask/*.jpg'))
+    if cell_type == 'rbc':
+        train_edge_list = sorted(glob.glob(f'data/{cell_type}/train/edge/*.jpg'))
+        test_edge_list = sorted(glob.glob(f'data/{cell_type}/test/edge/*.jpg'))
+    elif cell_type == 'wbc' or cell_type == 'plt':
         train_edge_list = None
         test_edge_list = None
     else:
-        train_mask_list = None
-        test_mask_list = None
-        return False
+        print('Invalid blood cell type!\n')
+        return
 
     # loading train dataset and test datasets
-    if cell_type == 'red':
-        train_dataset = data.generator(
-            train_img_list,
-            train_mask_list,
-            train_edge_list,
-            type='train'
-        )
-        test_dataset = data.generator(
-            test_img_list,
-            test_mask_list,
-            test_edge_list,
-            type='test'
-        )
-    elif cell_type == 'white':
-        train_dataset = data.generator(
-            train_img_list,
-            train_mask_list,
-            train_edge_list,
-            type='train'
-        )
-        test_dataset = data.generator(
-            test_img_list,
-            test_mask_list,
-            type='test'
-        )
+    train_dataset = data.generator(
+        train_img_list,
+        train_mask_list,
+        train_edge_list,
+        type='train'
+    )
+    test_dataset = data.generator(
+        test_img_list,
+        test_mask_list,
+        test_edge_list,
+        type='test'
+    )
 
     # initializing the do_unet model
     model = do_unet()
@@ -140,18 +122,20 @@ def predict(img='Im037_0'):
     '''
     Predict (segment) blood cell images using the trained model (do_unet)
     '''
-    if cell_type == 'red':
-        model_name = 'rbc'
-        test_img = sorted(glob.glob(f'data/rbc/test/image/{img}.jpg'))
-        test_mask = sorted(glob.glob(f'data/rbc/test/mask/{img}_R.jpg'))
-        test_edge = sorted(glob.glob(f'data/rbc/test/edge/{img}_RE.jpg'))
-    elif cell_type == 'white':
-        model_name = 'wbc'
-        test_img = sorted(glob.glob(f'data/wbc/test/image/{img}.jpg'))
-        test_mask = sorted(glob.glob(f'data/wbc/test/mask/{img}_W.jpg'))
+    # # Check for existing predictions
+    # if os.path.exists(f'{output_directory}/mask.png'):
+    #     print('Prediction already exists!')
+    #     return
+
+    test_img = sorted(glob.glob(f'data/{cell_type}/test/image/{img}.jpg'))
+    test_mask = sorted(glob.glob(f'data/{cell_type}/test/mask/{img}_R.jpg'))
+    if cell_type == 'rbc':
+        test_edge = sorted(glob.glob(f'data/{cell_type}/test/edge/{img}_RE.jpg'))
+    elif cell_type == 'wbc' or cell_type == 'plt':
         test_edge = None
     else:
-        return False
+        print('Invalid blood cell type!\n')
+        return
 
     # initialize do_unet
     model = do_unet()
@@ -161,7 +145,7 @@ def predict(img='Im037_0'):
         model.load_weights(f'models/{model_name}.h5')
 
     # load test data
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
 
         img_chips, mask_chips, edge_chips = data.slice(
@@ -172,7 +156,7 @@ def predict(img='Im037_0'):
             input_size=input_shape[0],
             output_size=output_shape[0],
         )
-    elif cell_type == 'white':
+    else:
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
         img_chips, mask_chips = data.slice(
@@ -184,37 +168,30 @@ def predict(img='Im037_0'):
         )
 
     # segment all image chips
-    if cell_type == 'red':
-        output = model.predict(img_chips)
+    output = model.predict(img_chips)
+    if cell_type == 'rbc':
         new_mask_chips = np.array(output[0])
         new_edge_chips = np.array(output[1])
-    elif cell_type == 'white':
-        output = model.predict(img_chips)
+    elif cell_type == 'wbc':
         new_mask_chips = np.array(output)
 
     # get image dimensions
     dimensions = [get_sizes(img)[0][0], get_sizes(img)[0][1]]
 
     # reshape chips arrays to be concatenated
-    if cell_type == 'red':
-        new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
+    new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
+    if cell_type == 'rbc':
         new_edge_chips = reshape(new_edge_chips, dimensions[0], dimensions[1])
-    elif cell_type == 'white':
-        new_mask_chips = reshape(new_mask_chips, dimensions[0], dimensions[1])
 
     # get rid of none necessary dimension
-    if cell_type == 'red':
-        new_mask_chips = np.squeeze(new_mask_chips)
+    new_mask_chips = np.squeeze(new_mask_chips)
+    if cell_type == 'rbc':
         new_edge_chips = np.squeeze(new_edge_chips)
-    elif cell_type == 'white':
-        new_mask_chips = np.squeeze(new_mask_chips)
 
     # concatenate chips into a single image (mask and edge)
-    if cell_type == 'red':
-        new_mask = concat(new_mask_chips)
+    new_mask = concat(new_mask_chips)
+    if cell_type == 'rbc':
         new_edge = concat(new_edge_chips)
-    elif cell_type == 'white':
-        new_mask = concat(new_mask_chips)
     
     # create output directories if it does not exist
     if not os.path.exists('output/'):
@@ -225,12 +202,12 @@ def predict(img='Im037_0'):
 
     # save predicted mask and edge
     plt.imsave(f'{output_directory}/mask.png', new_mask)
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         plt.imsave(f'{output_directory}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
 
     # organize results into one figure
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         fig = plt.figure(figsize=(25, 12), dpi=80)
         fig.subplots_adjust(hspace=0.1, wspace=0.1)
         ax  = fig.add_subplot(2, 3, 1)
@@ -248,7 +225,7 @@ def predict(img='Im037_0'):
         ax  = fig.add_subplot(2, 3, 6)
         ax.set_title('Predicted edge')
         ax.imshow(new_edge)
-    elif cell_type == 'white':
+    elif cell_type == 'wbc':
         fig = plt.figure(figsize=(25, 12), dpi=80)
         fig.subplots_adjust(hspace=0.1, wspace=0.1)
         ax  = fig.add_subplot(2, 2, 1)
@@ -270,16 +247,15 @@ def evaluate(model_name='mse'):
     '''
     Evaluate an already trained model
     '''
-    if cell_type == 'red':
-        test_img_list = sorted(glob.glob('data/rbc/test/image/*.jpg'))
-        test_mask_list = sorted(glob.glob('data/rbc/test/mask/*.jpg'))
-        test_edge_list = sorted(glob.glob('data/rbc/test/edge/*.jpg'))
-    elif cell_type == 'white':
-        test_img_list = sorted(glob.glob('data/wbc/test/image/*.jpg'))
-        test_mask_list = sorted(glob.glob('data/wbc/test/mask/*.jpg'))
+    test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
+    test_mask_list = sorted(glob.glob(f'data/{cell_type}/test/mask/*.jpg'))
+    if cell_type == 'rbc':
+        test_edge_list = sorted(glob.glob(f'data/{cell_type}/test/edge/*.jpg'))
+    elif cell_type == 'wbc' cell_type == 'plt':
         test_edge_list = None
     else:
-        return False
+        print('Invalid blood cell type!\n')
+        return
 
     # initialize do_unet
     model = do_unet()
@@ -291,10 +267,10 @@ def evaluate(model_name='mse'):
         train(model_name)
 
     # load test data
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
 
-        img_chips, mask_chips, edge_chips = data.test_chips(
+        img_chips, mask_chips, edge_chips = data.slice(
             img,
             mask,
             edge,
@@ -302,10 +278,10 @@ def evaluate(model_name='mse'):
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
-    elif cell_type == 'white':
+    elif cell_type == 'wbc':
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
-        img_chips, mask_chips = data.test_chips(
+        img_chips, mask_chips = data.test_slice(
             img,
             mask,
             padding=padding[1],
@@ -314,7 +290,7 @@ def evaluate(model_name='mse'):
         )
 
     # print the evaluated accuracies
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         print(model.evaluate(img_chips, (mask_chips, edge_chips)))
     else:
         print(model.evaluate(img_chips, (mask_chips)))
@@ -356,9 +332,9 @@ def hough_transform(img='edge.png'):
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # apply hough circles
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
-    elif cell_type == 'white':
+    elif cell_type == 'wbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=41, maxRadius=80, minRadius=51, param1=30, param2=20)
     output = img.copy()
 
@@ -435,12 +411,12 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    train('rbc')
+    # train('rbc')
     # evaluate(model_name='quadtree_test')
-    # predict()
+    predict()
     # threshold('mask.png')
 
-    # if cell_type == 'red':
+    # if cell_type == 'rbc':
     #     threshold('edge.png')
     #     threshold('edge_mask.png')
     #     distance_transform('threshold_edge_mask.png')

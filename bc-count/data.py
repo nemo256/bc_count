@@ -278,9 +278,9 @@ def slice(imgs, mask,
 
 
 def generator(img_list, mask_list, edge_list=None, type='train'):
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         img, mask, edge = load_data(img_list, mask_list, edge_list)
-    elif cell_type == 'white':
+    elif cell_type == 'wbc':
         img, mask = load_data(img_list, mask_list, edge_list)
         edge = None
 
@@ -297,13 +297,13 @@ def generator(img_list, mask_list, edge_list=None, type='train'):
                                    output_size=output_shape[0])
 
     # load train dataset to tensorflow for training
-    if cell_type == 'red':
+    if cell_type == 'rbc':
         return tf.data.Dataset.from_generator(
             gen,
             (tf.float64, ((tf.float64), (tf.float64))),
             (input_shape, (output_shape, output_shape))
         )
-    elif cell_type == 'white':
+    elif cell_type == 'wbc':
         return tf.data.Dataset.from_generator(
             gen,
             (tf.float64, (tf.float64)),
