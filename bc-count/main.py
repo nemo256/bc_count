@@ -20,11 +20,18 @@ def generate_train_dataset(img_list, mask_list, edge_list):
         edge = None
 
 
-    def train_gen():
-        return data.train_generator(img, mask, edge,
-                                    padding=padding[0],
-                                    input_size=input_shape[0],
-                                    output_size=output_shape[0])
+    if cell_type == 'red':
+        def train_gen():
+            return data.train_generator(img, mask, edge,
+                                        padding=padding[0],
+                                        input_size=input_shape[0],
+                                        output_size=output_shape[0])
+    elif cell_type == 'white':
+        def train_gen():
+            return data.train_generator(img, mask,
+                                        padding=padding[0],
+                                        input_size=input_shape[0],
+                                        output_size=output_shape[0])
 
     # load train dataset to tensorflow for training
     if cell_type == 'red':
@@ -61,7 +68,6 @@ def generate_test_dataset(img_list, mask_list, edge_list):
         img_chips, mask_chips = data.test_chips(
             img,
             mask,
-            edge,
             padding=padding[1],
             input_size=input_shape[0],
             output_size=output_shape[0]
