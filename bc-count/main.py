@@ -70,16 +70,18 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
+
+    print(len(img_chips))
         
-    # load test dataset to tensorflow for training
-    if cell_type == 'red':
-        return tf.data.Dataset.from_tensor_slices(
-            (img_chips, (mask_chips, edge_chips))
-        )
-    elif cell_type == 'white':
-        return tf.data.Dataset.from_tensor_slices(
-            (img_chips, (mask_chips))
-        )
+    # # load test dataset to tensorflow for training
+    # if cell_type == 'red':
+    #     return tf.data.Dataset.from_tensor_slices(
+    #         (img_chips, (mask_chips, edge_chips))
+    #     )
+    # elif cell_type == 'white':
+    #     return tf.data.Dataset.from_tensor_slices(
+    #         (img_chips, (mask_chips))
+    #     )
 
 
 def train(model_name='mse', epochs=100):
@@ -124,9 +126,6 @@ def train(model_name='mse', epochs=100):
             test_img_list,
             test_mask_list,
         )
-
-    print(len(test_dataset))
-
 
     # # initializing the do_unet model
     # model = do_unet()
