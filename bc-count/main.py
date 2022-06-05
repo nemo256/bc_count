@@ -12,7 +12,7 @@ from model import do_unet, get_callbacks
 
 
 # global variables
-cell_type       = 'red'              # red, white or platelets
+cell_type       = 'white'              # red, white or platelets
 input_shape     = (188, 188, 3)
 output_shape    = (100, 100, 1)
 padding         = [200, 100]
@@ -456,12 +456,12 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    # train('wbc')
+    train('wbc')
     # evaluate(model_name='quadtree_test')
     # predict(model_name='mse')
-    threshold('mask.png')
-    threshold('edge.png')
-    threshold('edge_mask.png')
-    distance_transform('threshold_edge_mask.png')
-    hough_transform('edge.png')
-    component_labeling('distance_transform.png')
+    # threshold('mask.png')
+    # threshold('edge.png')
+    # threshold('edge_mask.png')
+    # distance_transform('threshold_edge_mask.png')
+    # hough_transform('edge.png')
+    # component_labeling('distance_transform.png')
