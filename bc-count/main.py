@@ -35,26 +35,26 @@ def train(model_name='mse', epochs=100):
 
     # loading train dataset and test datasets
     if cell_type == 'red':
-        train_dataset = generator(
+        train_dataset = data.generator(
             train_img_list,
             train_mask_list,
             train_edge_list,
             type='train'
         )
-        test_dataset = generator(
+        test_dataset = data.generator(
             test_img_list,
             test_mask_list,
             test_edge_list,
             type='test'
         )
     elif cell_type == 'white':
-        train_dataset = generator(
+        train_dataset = data.generator(
             train_img_list,
             train_mask_list,
             train_edge_list,
             type='train'
         )
-        test_dataset = generator(
+        test_dataset = data.generator(
             test_img_list,
             test_mask_list,
             type='test'

@@ -227,21 +227,21 @@ def test_chips(imgs, mask,
                 break
 
 
-def generator(img_list, mask_list, edge_list=None, type):
+def generator(img_list, mask_list, edge_list=None, type='train'):
     if cell_type == 'red':
-        img, mask, edge = data.load_data(img_list, mask_list, edge_list)
+        img, mask, edge = load_data(img_list, mask_list, edge_list)
     elif cell_type == 'white':
-        img, mask = data.load_data(img_list, mask_list, edge_list)
+        img, mask = load_data(img_list, mask_list, edge_list)
         edge = None
 
     def gen():
         if type == 'train':
-            return data.train_generator(img, mask, edge,
+            return train_generator(img, mask, edge,
                                         padding=padding[0],
                                         input_size=input_shape[0],
                                         output_size=output_shape[0])
         elif type == 'test':
-            return data.test_chips(img, mask, edge,
+            return test_chips(img, mask, edge,
                                    padding=padding[0],
                                    input_size=input_shape[0],
                                    output_size=output_shape[0])
