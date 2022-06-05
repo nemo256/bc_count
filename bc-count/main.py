@@ -12,7 +12,7 @@ import data
 from model import do_unet, get_callbacks
 
 
-def train(model_name='mse', epochs=500):
+def train(model_name='mse', epochs=50):
     # globing appropriate images, their masks and their edges
     train_img_list = sorted(glob.glob(f'data/{cell_type}/train/image/*.jpg'))
     test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
@@ -128,9 +128,9 @@ def predict(img='Im037_0'):
     #     return
 
     test_img = sorted(glob.glob(f'data/{cell_type}/test/image/{img}.jpg'))
-    test_mask = sorted(glob.glob(f'data/{cell_type}/test/mask/{img}_R.jpg'))
+    test_mask = sorted(glob.glob(f'data/{cell_type}/test/mask/{img}.jpg'))
     if cell_type == 'rbc':
-        test_edge = sorted(glob.glob(f'data/{cell_type}/test/edge/{img}_RE.jpg'))
+        test_edge = sorted(glob.glob(f'data/{cell_type}/test/edge/{img}.jpg'))
     elif cell_type == 'wbc' or cell_type == 'plt':
         test_edge = None
     else:
@@ -251,7 +251,7 @@ def evaluate(model_name='mse'):
     test_mask_list = sorted(glob.glob(f'data/{cell_type}/test/mask/*.jpg'))
     if cell_type == 'rbc':
         test_edge_list = sorted(glob.glob(f'data/{cell_type}/test/edge/*.jpg'))
-    elif cell_type == 'wbc' cell_type == 'plt':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         test_edge_list = None
     else:
         print('Invalid blood cell type!\n')

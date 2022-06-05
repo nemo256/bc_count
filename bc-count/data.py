@@ -230,9 +230,9 @@ def test_chips(imgs, mask,
 
 def slice(imgs, mask,
           edge=None,
-          padding=100,
-          input_size=188,
-          output_size=100):
+          padding=padding[1],
+          input_size=input_shape[0],
+          output_size=output_shape[0]):
     img_chips = []
     mask_chips = []
     if edge is not None:
