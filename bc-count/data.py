@@ -225,3 +225,37 @@ def test_chips(imgs, mask,
                 else:
                     yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
                 break
+
+
+def generator(img_list, mask_list, edge_list=None, type):
+    if cell_type == 'red':
+        img, mask, edge = data.load_data(img_list, mask_list, edge_list)
+    elif cell_type == 'white':
+        img, mask = data.load_data(img_list, mask_list, edge_list)
+        edge = None
+
+    def gen():
+        if type == 'train':
+            return data.train_generator(img, mask, edge,
+                                        padding=padding[0],
+                                        input_size=input_shape[0],
+                                        output_size=output_shape[0])
+        elif type == 'test':
+            return data.test_chips(img, mask, edge,
+                                   padding=padding[0],
+                                   input_size=input_shape[0],
+                                   output_size=output_shape[0])
+
+    # load train dataset to tensorflow for training
+    if cell_type == 'red':
+        return tf.data.Dataset.from_generator(
+            train_gen,
+            (tf.float64, ((tf.float64), (tf.float64))),
+            (input_shape, (output_shape, output_shape))
+        )
+    elif cell_type == 'white':
+        return tf.data.Dataset.from_generator(
+            train_gen,
+            (tf.float64, (tf.float64)),
+            (input_shape, (output_shape))
+        )

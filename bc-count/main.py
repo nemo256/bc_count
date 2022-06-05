@@ -12,39 +12,6 @@ import data
 from model import do_unet, get_callbacks
 
 
-def generate_train_dataset(img_list, mask_list, edge_list=None):
-    if cell_type == 'red':
-        img, mask, edge = data.load_data(img_list, mask_list, edge_list)
-    elif cell_type == 'white':
-        img, mask = data.load_data(img_list, mask_list, edge_list)
-        edge = None
-
-    if cell_type == 'red':
-        def train_gen():
-            return data.train_generator(img, mask, edge,
-                                        padding=padding[0],
-                                        input_size=input_shape[0],
-                                        output_size=output_shape[0])
-    elif cell_type == 'white':
-        def train_gen():
-            return data.train_generator(img, mask,
-                                        padding=padding[0],
-                                        input_size=input_shape[0],
-                                        output_size=output_shape[0])
-
-    # load train dataset to tensorflow for training
-    if cell_type == 'red':
-        return tf.data.Dataset.from_generator(
-            train_gen,
-            (tf.float64, ((tf.float64), (tf.float64))),
-            (input_shape, (output_shape, output_shape))
-        )
-    elif cell_type == 'white':
-        return tf.data.Dataset.from_generator(
-            train_gen,
-            (tf.float64, (tf.float64)),
-            (input_shape, (output_shape))
-        )
 
 
 def generate_test_dataset(img_list, mask_list, edge_list=None):
@@ -56,10 +23,6 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
 
     if cell_type == 'red':
         def test_gen():
-            return data.test_chips(img, mask, edge,
-                                   padding=padding[0],
-                                   input_size=input_shape[0],
-                                   output_size=output_shape[0])
     elif cell_type == 'white':
         def test_gen():
             return data.test_chips(img, mask,
@@ -80,14 +43,6 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
             (tf.float64, (tf.float64)),
             (input_shape, (output_shape))
         )
-
-
-def chunks(l, n):
-    '''
-    Return successive n-sized chunks from lst.
-    '''
-    n = max(1, n)
-    return (l[i:i+n] for i in range(0, len(l), n))
 
 
 def train(model_name='mse', epochs=100):
@@ -113,24 +68,29 @@ def train(model_name='mse', epochs=100):
 
     # loading train dataset and test datasets
     if cell_type == 'red':
-        train_dataset = generate_train_dataset(
+        train_dataset = generator(
             train_img_list,
             train_mask_list,
             train_edge_list,
+            type='train'
         )
-        test_dataset = generate_test_dataset(
+        test_dataset = generator(
             test_img_list,
             test_mask_list,
             test_edge_list,
+            type='test'
         )
     elif cell_type == 'white':
-        train_dataset = generate_train_dataset(
+        train_dataset = generator(
             train_img_list,
             train_mask_list,
+            train_edge_list,
+            type='train'
         )
-        test_dataset = generate_test_dataset(
+        test_dataset = generator(
             test_img_list,
             test_mask_list,
+            type='test'
         )
 
     # initializing the do_unet model
