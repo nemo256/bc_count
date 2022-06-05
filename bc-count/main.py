@@ -220,19 +220,14 @@ def predict(img='Im037_0'):
     if not os.path.exists('output/'):
         os.makedirs('output/')
 
-    if not os.path.exists('output/rbc'):
-        os.makedirs('output/rbc')
-
-    if not os.path.exists('output/wbc'):
-        os.makedirs('output/wbc')
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
 
     # save predicted mask and edge
+    plt.imsave(f'{output_directory}/mask.png', new_mask)
     if cell_type == 'red':
-        plt.imsave('output/rbc/mask.png', new_mask)
-        plt.imsave('output/rbc/edge.png', new_edge)
-        plt.imsave('output/rbc/edge_mask.png', new_mask - new_edge)
-    elif cell_type == 'white':
-        plt.imsave('output/wbc/mask.png', new_mask)
+        plt.imsave(f'{output_directory}/edge.png', new_edge)
+        plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
 
     # organize results into one figure
     if cell_type == 'red':
@@ -327,41 +322,44 @@ def evaluate(model_name='mse'):
 
 # threshold an image using otsu's threshold
 def threshold(img='edge.png'):
-    if not os.path.exists(f'output/{img}'):
+    if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
 
     # substract if img is edge_mask
     if img == 'edge_mask.png':
-        mask = cv2.imread(f'output/threshold_mask.png')
-        edge = cv2.imread(f'output/threshold_edge.png')
+        mask = cv2.imread(f'{output_directory}/threshold_mask.png')
+        edge = cv2.imread(f'{output_directory}/threshold_edge.png')
 
         # substract mask - edge
         image = mask - edge
     else:
         # getting the input image
-        image = cv2.imread(f'output/{img}')
+        image = cv2.imread(f'{output_directory}/{img}')
 
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         otsu_threshold, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU,)
 
     # save the resulting thresholded image
-    plt.imsave(f'output/threshold_{img}', image, cmap='gray')
+    plt.imsave(f'{output_directory}/threshold_{img}', image, cmap='gray')
     
 
 # count how many cells from the predicted edges
 def hough_transform(img='edge.png'):
-    if not os.path.exists(f'output/{img}'):
+    if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'output/{img}')
+    image = cv2.imread(f'{output_directory}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # apply hough circles
-    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
+    if cell_type == 'red':
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
+    elif cell_type == 'white':
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=41, maxRadius=80, minRadius=51, param1=30, param2=20)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -375,7 +373,7 @@ def hough_transform(img='edge.png'):
             cv2.circle(output, (x, y), r, (0, 0, 255), 2)
             cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 0, 255), -1)
         # save the output image
-        plt.imsave('output/hough_transform.png',
+        plt.imsave(f'{output_directory}/hough_transform.png',
                    np.hstack([img, output]))
 
     # show the hough_transform results
@@ -384,12 +382,12 @@ def hough_transform(img='edge.png'):
 
 # count how many cells from the predicted edges
 def component_labeling(img='edge.png'):
-    if not os.path.exists(f'output/{img}'):
+    if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'output/{img}')
+    image = cv2.imread(f'{output_directory}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # converting those pixels with values 1-127 to 0 and others to 1
@@ -409,7 +407,7 @@ def component_labeling(img='edge.png'):
     output[label_hue==0] = 0
     
     # saving image after Component Labeling
-    plt.imsave('output/component_labeling.png',
+    plt.imsave(f'{output_directory}/component_labeling.png',
                np.hstack([image, output]))
 
     # show number of labels detected
@@ -418,12 +416,12 @@ def component_labeling(img='edge.png'):
 
 # get a minimal of each cell to help with the counting
 def distance_transform(img='threshold_edge_mask.png'):
-    if not os.path.exists(f'output/{img}'):
+    if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'output/{img}')
+    image = cv2.imread(f'{output_directory}/{img}')
     # convert to numpy array
     img = np.asarray(image)
     # convert to grayscale
@@ -433,17 +431,23 @@ def distance_transform(img='threshold_edge_mask.png'):
     img = ndimage.binary_dilation(img)
 
     # saving image after Component Labeling
-    plt.imsave('output/distance_transform.png', img, cmap='gray')
+    plt.imsave(f'{output_directory}/distance_transform.png', img, cmap='gray')
 
 
 
 if __name__ == '__main__':
-    # train('wbc')
+    train('rbc')
     # evaluate(model_name='quadtree_test')
-    predict()
+    # predict()
     # threshold('mask.png')
-    # threshold('edge.png')
-    # threshold('edge_mask.png')
-    # distance_transform('threshold_edge_mask.png')
-    # hough_transform('edge.png')
+
+    # if cell_type == 'red':
+    #     threshold('edge.png')
+    #     threshold('edge_mask.png')
+    #     distance_transform('threshold_edge_mask.png')
+    #     hough_transform('edge.png')
+    # else:
+    #     distance_transform('threshold_mask.png')
+    #     hough_transform('mask.png')
+
     # component_labeling('distance_transform.png')
