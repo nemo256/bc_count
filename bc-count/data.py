@@ -197,30 +197,31 @@ def test_chips(imgs, mask,
                input_size=188,
                output_size=100):
     center_offset = padding + (output_size / 2)
-    while True:
-        while True:
-            chip_x_l = int(x - (input_size / 2))
-            chip_x_r = int(x + (input_size / 2))
-            chip_y_l = int(y - (input_size / 2))
-            chip_y_r = int(y + (input_size / 2))
+    for i, _ in enumerate(imgs):
+        for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
+            for y in np.arange(center_offset, imgs[i].shape[1] - input_size / 2, output_size):
+                chip_x_l = int(x - (input_size / 2))
+                chip_x_r = int(x + (input_size / 2))
+                chip_y_l = int(y - (input_size / 2))
+                chip_y_r = int(y + (input_size / 2))
 
-            mask_x_l = int(x - (output_size / 2))
-            mask_x_r = int(x + (output_size / 2))
-            mask_y_l = int(y - (output_size / 2))
-            mask_y_r = int(y + (output_size / 2))
+                mask_x_l = int(x - (output_size / 2))
+                mask_x_r = int(x + (output_size / 2))
+                mask_y_l = int(y - (output_size / 2))
+                mask_y_r = int(y + (output_size / 2))
 
-            temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
-            temp_mask = mask[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
-            if edge is not None:
-                temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+                temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
+                temp_mask = mask[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
+                if edge is not None:
+                    temp_edge = edge[i][mask_x_l:mask_x_r, mask_y_l:mask_y_r]
 
-            temp_chip = temp_chip.astype(np.float32) * 2
-            temp_chip /= 255
-            temp_chip -= 1
+                temp_chip = temp_chip.astype(np.float32) * 2
+                temp_chip /= 255
+                temp_chip -= 1
 
-            if edge is not None:
-                yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
-                                  (temp_edge > 0).astype(float)[..., np.newaxis])
-            else:
-                yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
-            break
+                if edge is not None:
+                    yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis], 
+                                      (temp_edge > 0).astype(float)[..., np.newaxis])
+                else:
+                    yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
+                break
