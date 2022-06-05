@@ -82,6 +82,14 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
         )
 
 
+def chunks(l, n):
+    '''
+    Return successive n-sized chunks from lst.
+    '''
+    n = max(1, n)
+    return (l[i:i+n] for i in range(0, len(l), n))
+
+
 def train(model_name='mse', epochs=100):
     # globing appropriate images, their masks and their edges
     if cell_type == 'red':
@@ -116,16 +124,19 @@ def train(model_name='mse', epochs=100):
             test_edge_list,
         )
     elif cell_type == 'white':
-        train_dataset = generate_train_dataset(
-            train_img_list,
-            train_mask_list,
-        )
-        test_dataset = []
-        for i in range(len(test_img_list)):
-            test_dataset += [generate_test_dataset(test_img_list[i],
-                                                   test_mask_list[i])]
-
-    print(len(test_dataset))
+        # train_dataset = generate_train_dataset(
+        #     train_img_list,
+        #     train_mask_list,
+        # )
+        test_img_set = np.array_split(test_img_list, len(test_img_list) / 11))
+        test_mask_set = np.array_split(test_mask_list, len(test_mask_list) / 11))
+        for i in range(3):
+            test_dataset += [
+                generate_test_dataset(
+                    test_img_set[i],
+                    test_mask_set[i]
+                )
+            ]
 
     # # initializing the do_unet model
     # model = do_unet()
