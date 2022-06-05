@@ -144,7 +144,7 @@ def train(model_name='mse', epochs=100):
         train_dataset.batch(8),
         validation_data=test_dataset.batch(8),
         epochs=epochs,
-        steps_per_epoch=1,
+        steps_per_epoch=125,
         max_queue_size=16,
         use_multiprocessing=True,
         workers=8,
