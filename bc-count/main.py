@@ -78,7 +78,7 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
         )
     elif cell_type == 'white':
         return tf.data.Dataset.from_tensor_slices(
-            (img_chips, (mask_chips))
+            (img_chips, mask_chips)
         )
 
 
@@ -116,10 +116,10 @@ def train(model_name='mse', epochs=100):
             test_edge_list,
         )
     elif cell_type == 'white':
-        # train_dataset = generate_train_dataset(
-        #     train_img_list,
-        #     train_mask_list,
-        # )
+        train_dataset = generate_train_dataset(
+            train_img_list,
+            train_mask_list,
+        )
         test_dataset = generate_test_dataset(
             test_img_list,
             test_mask_list,
