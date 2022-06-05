@@ -51,34 +51,34 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
     if cell_type == 'red':
         img, mask, edge = data.load_data(img_list, mask_list, edge_list)
     elif cell_type == 'white':
-        img, mask = data.load_data(img_list, mask_list)
+        img, mask = data.load_data(img_list, mask_list, edge_list)
+        edge = None
 
     if cell_type == 'red':
-        img_chips, mask_chips, edge_chips = data.test_chips(
-            img,
-            mask,
-            edge,
-            padding=padding[1],
-            input_size=input_shape[0],
-            output_size=output_shape[0]
-        )
+        def test_gen():
+            return data.test_chips(img, mask, edge,
+                                   padding=padding[0],
+                                   input_size=input_shape[0],
+                                   output_size=output_shape[0])
     elif cell_type == 'white':
-        img_chips, mask_chips = data.test_chips(
-            img,
-            mask,
-            padding=padding[1],
-            input_size=input_shape[0],
-            output_size=output_shape[0]
-        )
+        def test_gen():
+            return data.test_chips(img, mask,
+                                   padding=padding[0],
+                                   input_size=input_shape[0],
+                                   output_size=output_shape[0])
 
-    # load test dataset to tensorflow for training
+    # load train dataset to tensorflow for training
     if cell_type == 'red':
-        return tf.data.Dataset.from_tensor_slices(
-            (img_chips, (mask_chips, edge_chips))
+        return tf.data.Dataset.from_generator(
+            test_gen,
+            (tf.float64, ((tf.float64), (tf.float64))),
+            (input_shape, (output_shape, output_shape))
         )
     elif cell_type == 'white':
-        return tf.data.Dataset.from_tensor_slices(
-            (img_chips, (mask_chips))
+        return tf.data.Dataset.from_generator(
+            test_gen,
+            (tf.float64, (tf.float64)),
+            (input_shape, (output_shape))
         )
 
 
@@ -124,47 +124,41 @@ def train(model_name='mse', epochs=100):
             test_edge_list,
         )
     elif cell_type == 'white':
-        # train_dataset = generate_train_dataset(
-        #     train_img_list,
-        #     train_mask_list,
-        # )
-        test_img_set = np.array_split(test_img_list, len(test_img_list) / 3)
-        test_mask_set = np.array_split(test_mask_list, len(test_mask_list) / 3)
-        test_dataset = []
-        for i in range(11):
-            test_dataset += [
-                generate_test_dataset(
-                    test_img_set[i],
-                    test_mask_set[i]
-                )
-            ]
+        train_dataset = generate_train_dataset(
+            train_img_list,
+            train_mask_list,
+        )
+        test_dataset = generate_test_dataset(
+            test_img_list,
+            test_mask_list,
+        )
 
-    # # initializing the do_unet model
-    # model = do_unet()
+    # initializing the do_unet model
+    model = do_unet()
 
-    # # create models directory if it does not exist
-    # if not os.path.exists('models/'):
-    #     os.makedirs('models/')
+    # create models directory if it does not exist
+    if not os.path.exists('models/'):
+        os.makedirs('models/')
 
-    # # Check for existing weights
-    # if os.path.exists(f'models/{model_name}.h5'):
-    #     model.load_weights(f'models/{model_name}.h5')
+    # Check for existing weights
+    if os.path.exists(f'models/{model_name}.h5'):
+        model.load_weights(f'models/{model_name}.h5')
 
-    # # fitting the model
-    # history = model.fit(
-    #     train_dataset.batch(8),
-    #     validation_data=test_dataset.batch(8),
-    #     epochs=epochs,
-    #     steps_per_epoch=125,
-    #     max_queue_size=16,
-    #     use_multiprocessing=True,
-    #     workers=8,
-    #     verbose=1,
-    #     callbacks=get_callbacks(model_name)
-    # )
+    # fitting the model
+    history = model.fit(
+        train_dataset.batch(8),
+        validation_data=test_dataset.batch(8),
+        epochs=epochs,
+        steps_per_epoch=125,
+        max_queue_size=16,
+        use_multiprocessing=True,
+        workers=8,
+        verbose=1,
+        callbacks=get_callbacks(model_name)
+    )
 
-    # # save the history
-    # np.save(f'models/{model_name}_history.npy', history.history)
+    # save the history
+    np.save(f'models/{model_name}_history.npy', history.history)
 
 
 def normalize(img):

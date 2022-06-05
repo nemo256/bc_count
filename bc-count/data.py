@@ -196,11 +196,6 @@ def test_chips(imgs, mask,
                padding=padding[1],
                input_size=188,
                output_size=100):
-    img_chips = []
-    mask_chips = []
-    if edge is not None:
-        edge_chips = []
-
     center_offset = padding + (output_size / 2)
     for i, _ in enumerate(imgs):
         for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
@@ -224,19 +219,8 @@ def test_chips(imgs, mask,
                 temp_chip /= 255
                 temp_chip -= 1
 
-                img_chips += [temp_chip]
-                mask_chips += [(temp_mask > 0).astype(float)[..., np.newaxis]]
                 if edge is not None:
-                    edge_chips += [(temp_edge > 0).astype(float)[..., np.newaxis]]
-
-
-    img_chips = np.array(img_chips)
-    mask_chips = np.array(mask_chips)
-
-    if edge is not None:
-        edge_chips = np.array(edge_chips)
-
-    if edge is not None:
-        return img_chips, mask_chips, edge_chips
-
-    return img_chips, mask_chips
+                    yield temp_chip, temp_mask, temp_edge
+                else:
+                    yield temp_chip, temp_mask
+                break
