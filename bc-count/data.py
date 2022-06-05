@@ -98,7 +98,7 @@ def aug_img(image):
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 
-def train_generator(imgs, mask, edge,
+def train_generator(imgs, mask, edge=None,
                     scale_range=None,
                     padding=padding[1],
                     input_size=188,
