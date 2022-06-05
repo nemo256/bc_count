@@ -69,9 +69,14 @@ def generate_test_dataset(img_list, mask_list, edge_list):
         edge_chips = None
 
     # load test dataset to tensorflow for training
-    return tf.data.Dataset.from_tensor_slices(
-        (img_chips, (mask_chips, edge_chips))
-    )
+    if cell_type == 'red':
+        return tf.data.Dataset.from_tensor_slices(
+            (img_chips, (mask_chips, edge_chips))
+        )
+    elif cell_type == 'white':
+        return tf.data.Dataset.from_tensor_slices(
+            (img_chips, (mask_chips))
+        )
 
 
 def train(model_name='mse', epochs=100):
