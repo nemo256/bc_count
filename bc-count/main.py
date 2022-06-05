@@ -124,12 +124,12 @@ def train(model_name='mse', epochs=100):
             test_edge_list,
         )
     elif cell_type == 'white':
-        # train_dataset = generate_train_dataset(
-        #     train_img_list,
-        #     train_mask_list,
-        # )
-        test_img_set = np.array_split(test_img_list, len(test_img_list) / 11))
-        test_mask_set = np.array_split(test_mask_list, len(test_mask_list) / 11))
+        train_dataset = generate_train_dataset(
+            train_img_list,
+            train_mask_list,
+        )
+        test_img_set = np.array_split(test_img_list, len(test_img_list) / 11)
+        test_mask_set = np.array_split(test_mask_list, len(test_mask_list) / 11)
         for i in range(3):
             test_dataset += [
                 generate_test_dataset(
