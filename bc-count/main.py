@@ -168,7 +168,6 @@ def normalize(img):
     return np.array((img - np.min(img)) / (np.max(img) - np.min(img)))
 
 
-# extract number of image chips for an image
 def get_sizes(img,
               padding=padding[1],
               input=input_shape[0],
