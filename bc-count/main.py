@@ -78,7 +78,7 @@ def generate_test_dataset(img_list, mask_list, edge_list=None):
         )
     elif cell_type == 'white':
         return tf.data.Dataset.from_tensor_slices(
-            (img_chips, mask_chips)
+            (img_chips, (mask_chips))
         )
 
 
