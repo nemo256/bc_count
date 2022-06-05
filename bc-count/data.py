@@ -229,8 +229,10 @@ def test_chips(imgs, mask,
                 if edge is not None:
                     edge_chips += [(temp_edge > 0).astype(float)[..., np.newaxis]]
 
+
     img_chips = np.array(img_chips)
     mask_chips = np.array(mask_chips)
+
     if edge is not None:
         edge_chips = np.array(edge_chips)
 

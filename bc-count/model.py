@@ -56,10 +56,9 @@ def get_callbacks(name):
     '''
     return [
         tf.keras.callbacks.ModelCheckpoint(f'models/{name}.h5',
-                                           monitor='val_accuracy',
-                                           save_best_only=False,
-                                           save_weights_only=False,
-                                           verbose=2)
+                                           save_best_only=True,
+                                           save_weights_only=True,
+                                           verbose=1)
     ]
 
 
