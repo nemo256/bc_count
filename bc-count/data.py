@@ -281,21 +281,22 @@ def generator(img_list, mask_list, edge_list=None, type='train'):
     if cell_type == 'rbc':
         img, mask, edge = load_data(img_list, mask_list, edge_list)
     elif cell_type == 'wbc' or cell_type == 'plt':
-        img, mask = load_data(img_list, mask_list, edge_list)
+        img, mask = load_data(img_list, mask_list)
         edge = None
 
     def gen():
         if type == 'train':
             return train_generator(img, mask, edge,
-                                        padding=padding[0],
-                                        input_size=input_shape[0],
-                                        output_size=output_shape[0])
-        elif type == 'test':
-            return test_chips(img, mask, edge,
                                    padding=padding[0],
                                    input_size=input_shape[0],
                                    output_size=output_shape[0])
+        elif type == 'test':
+            return test_chips(img, mask, edge,
+                              padding=padding[0],
+                              input_size=input_shape[0],
+                              output_size=output_shape[0])
 
+    print(len(img))
     # load train dataset to tensorflow for training
     if cell_type == 'rbc':
         return tf.data.Dataset.from_generator(
