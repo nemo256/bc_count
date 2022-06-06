@@ -296,7 +296,6 @@ def generator(img_list, mask_list, edge_list=None, type='train'):
                               input_size=input_shape[0],
                               output_size=output_shape[0])
 
-    print(len(img))
     # load train dataset to tensorflow for training
     if cell_type == 'rbc':
         return tf.data.Dataset.from_generator(
