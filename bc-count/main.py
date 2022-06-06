@@ -411,18 +411,18 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    # train('rbc')
+    train('plt')
     # evaluate(model_name='quadtree_test')
-    predict()
-    threshold('mask.png')
+    # predict()
+    # threshold('mask.png')
 
-    if cell_type == 'rbc':
-        threshold('edge.png')
-        threshold('edge_mask.png')
-        distance_transform('threshold_edge_mask.png')
-        hough_transform('edge.png')
-    else:
-        distance_transform('threshold_mask.png')
-        hough_transform('mask.png')
+    # if cell_type == 'rbc':
+    #     threshold('edge.png')
+    #     threshold('edge_mask.png')
+    #     distance_transform('threshold_edge_mask.png')
+    #     hough_transform('edge.png')
+    # else:
+    #     distance_transform('threshold_mask.png')
+    #     hough_transform('mask.png')
 
-    component_labeling('distance_transform.png')
+    # component_labeling('distance_transform.png')
