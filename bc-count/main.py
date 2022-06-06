@@ -173,7 +173,7 @@ def predict(img='Im037_0'):
     if cell_type == 'rbc':
         new_mask_chips = np.array(output[0])
         new_edge_chips = np.array(output[1])
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         new_mask_chips = np.array(output)
 
     # get image dimensions
@@ -186,7 +186,7 @@ def predict(img='Im037_0'):
 
     # get rid of none necessary dimension
     new_mask_chips = np.squeeze(new_mask_chips)
-    if cell_type == 'rbc':
+    if cell_type == 'rbc' cell_type == 'plt':
         new_edge_chips = np.squeeze(new_edge_chips)
 
     # concatenate chips into a single image (mask and edge)
@@ -226,7 +226,7 @@ def predict(img='Im037_0'):
         ax  = fig.add_subplot(2, 3, 6)
         ax.set_title('Predicted edge')
         ax.imshow(new_edge)
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         fig = plt.figure(figsize=(25, 12), dpi=80)
         fig.subplots_adjust(hspace=0.1, wspace=0.1)
         ax  = fig.add_subplot(2, 2, 1)
@@ -279,7 +279,7 @@ def evaluate(model_name='mse'):
             input_size=input_shape[0],
             output_size=output_shape[0]
         )
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         img, mask = data.load_data(test_img, test_mask, padding=padding[0])
 
         img_chips, mask_chips = data.test_slice(
@@ -335,7 +335,7 @@ def hough_transform(img='edge.png'):
     # apply hough circles
     if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=41, maxRadius=80, minRadius=51, param1=30, param2=20)
     output = img.copy()
 
