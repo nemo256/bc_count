@@ -115,7 +115,7 @@ def do_unet():
     if cell_type == 'rbc':
         out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
 
 
