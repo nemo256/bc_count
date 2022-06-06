@@ -186,7 +186,7 @@ def predict(img='Im037_0'):
 
     # get rid of none necessary dimension
     new_mask_chips = np.squeeze(new_mask_chips)
-    if cell_type == 'rbc' or cell_type == 'plt':
+    if cell_type == 'rbc':
         new_edge_chips = np.squeeze(new_edge_chips)
 
     # concatenate chips into a single image (mask and edge)
