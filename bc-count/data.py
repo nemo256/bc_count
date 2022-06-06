@@ -280,7 +280,7 @@ def slice(imgs, mask,
 def generator(img_list, mask_list, edge_list=None, type='train'):
     if cell_type == 'rbc':
         img, mask, edge = load_data(img_list, mask_list, edge_list)
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         img, mask = load_data(img_list, mask_list, edge_list)
         edge = None
 
@@ -303,7 +303,7 @@ def generator(img_list, mask_list, edge_list=None, type='train'):
             (tf.float64, ((tf.float64), (tf.float64))),
             (input_shape, (output_shape, output_shape))
         )
-    elif cell_type == 'wbc':
+    elif cell_type == 'wbc' or cell_type == 'plt':
         return tf.data.Dataset.from_generator(
             gen,
             (tf.float64, (tf.float64)),

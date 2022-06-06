@@ -13,11 +13,12 @@ from model import do_unet, get_callbacks
 
 
 def train(model_name='mse', epochs=50):
-    # globing appropriate images, their masks and their edges
+    # globing appropriate images, their masks and their edges (rbc)
     train_img_list = sorted(glob.glob(f'data/{cell_type}/train/image/*.jpg'))
     test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
     train_mask_list = sorted(glob.glob(f'data/{cell_type}/train/mask/*.jpg'))
     test_mask_list = sorted(glob.glob(f'data/{cell_type}/test/mask/*.jpg'))
+
     if cell_type == 'rbc':
         train_edge_list = sorted(glob.glob(f'data/{cell_type}/train/edge/*.jpg'))
         test_edge_list = sorted(glob.glob(f'data/{cell_type}/test/edge/*.jpg'))
