@@ -118,7 +118,6 @@ def do_unet():
     elif cell_type == 'wbc' or cell_type == 'plt':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
 
-
     opt = tf.optimizers.Adam(learning_rate=0.0001)
 
     if cell_type == 'rbc':
