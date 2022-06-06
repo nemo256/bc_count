@@ -53,6 +53,7 @@ def concatenate(input1, input2, crop):
 def get_callbacks(name):
     '''
     This is a custom function to save only the best checkpoint.
+    :param name --> the input model name
     '''
     return [
         tf.keras.callbacks.ModelCheckpoint(f'models/{name}.h5',
