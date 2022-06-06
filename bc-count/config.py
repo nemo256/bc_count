@@ -6,7 +6,7 @@ which stands for:
     wbc --> White blood cells
     plt --> Platelets
 '''
-cell_type        = 'plt'             # rbc, wbc or plt
+cell_type        = 'wbc'             # rbc, wbc or plt
 model_name       = cell_type
 input_shape      = (188, 188, 3)
 output_shape     = (100, 100, 1)

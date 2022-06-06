@@ -17,10 +17,12 @@ Count red, white blood cells to detect various diseases such as blood cancer (le
 bc-count/
 |-- bc-count/
 |   |-- test/
+|   |   |-- test_config.py
 |   |   |-- test_data.py
 |   |   |-- test_main.py
 |   |   |-- test_model.py
 |   |   
+|   |-- config.py
 |   |-- data.py
 |   |-- main.py
 |   |-- model.py

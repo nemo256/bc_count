@@ -4,8 +4,9 @@
 - [-] Prepare trained weights with different loss functions (binary crossentropy, Mean Squared Error MSE, Intersection Over Union IOU...)
 - [x] Train and test white blood cells
 - [x] Train and test red blood cells
-- [ ] Train and test platelets
+- [x] Train and test platelets
 - [ ] Add unit tests
 - [ ] Finish documenting all functions
+- [ ] Implement argument parser for deploying the bc-count script
 - [x] Publish this project to PyPI.
 - [x] Publish a stable python script to PyPI.
