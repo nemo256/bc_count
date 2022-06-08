@@ -5,7 +5,7 @@
 - [x] Train and test white blood cells
 - [x] Train and test red blood cells
 - [x] Train and test platelets
-- [ ] Add unit tests
+- [x] Add unit tests
 - [ ] Finish documenting all functions
 - [ ] Implement argument parser for deploying the bc-count script
 - [x] Publish this project to PyPI.

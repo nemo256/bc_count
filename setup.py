@@ -25,8 +25,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
     ],
-    scripts=['bin/bc-count'],
-    extras_require={
-        'testing': ['pytest'],
-    }
+    scripts=['bin/bc-count']
 )
