@@ -336,7 +336,7 @@ def hough_transform(img='edge.png'):
     if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
     elif cell_type == 'wbc' or cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=41, maxRadius=80, minRadius=51, param1=30, param2=20)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -414,7 +414,7 @@ def distance_transform(img='threshold_edge_mask.png'):
 if __name__ == '__main__':
     # train('wbc')
     # evaluate(model_name='quadtree_test')
-    predict(img='Im053_1')
+    predict()
     threshold('mask.png')
 
     if cell_type == 'rbc':
