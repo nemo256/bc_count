@@ -30,8 +30,8 @@ def train(model_name='mse', epochs=50):
         return
 
     img, mask = data.load_data(
-        test_img_list,
-        test_mask_list,
+        train_img_list,
+        train_mask_list,
         None
     )
 
