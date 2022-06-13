@@ -29,46 +29,55 @@ def train(model_name='mse', epochs=50):
         print('Invalid blood cell type!\n')
         return
 
-    # loading train dataset and test datasets
-    train_dataset = data.generator(
+    img, mask = data.load_data(
         train_img_list,
         train_mask_list,
-        train_edge_list,
-        type='train'
-    )
-    test_dataset = data.generator(
-        test_img_list,
-        test_mask_list,
-        test_edge_list,
-        type='test'
+        None
     )
 
-    # initializing the do_unet model
-    model = do_unet()
+    print(data.get_len(img))
+    print(data.get_len(mask))
 
-    # create models directory if it does not exist
-    if not os.path.exists('models/'):
-        os.makedirs('models/')
+    # # loading train dataset and test datasets
+    # train_dataset = data.generator(
+    #     train_img_list,
+    #     train_mask_list,
+    #     train_edge_list,
+    #     type='train'
+    # )
+    # test_dataset = data.generator(
+    #     test_img_list,
+    #     test_mask_list,
+    #     test_edge_list,
+    #     type='test'
+    # )
 
-    # Check for existing weights
-    if os.path.exists(f'models/{model_name}.h5'):
-        model.load_weights(f'models/{model_name}.h5')
+    # # initializing the do_unet model
+    # model = do_unet()
 
-    # fitting the model
-    history = model.fit(
-        train_dataset.batch(8),
-        validation_data=test_dataset.batch(8),
-        epochs=epochs,
-        steps_per_epoch=125,
-        max_queue_size=16,
-        use_multiprocessing=True,
-        workers=8,
-        verbose=1,
-        callbacks=get_callbacks(model_name)
-    )
+    # # create models directory if it does not exist
+    # if not os.path.exists('models/'):
+    #     os.makedirs('models/')
 
-    # save the history
-    np.save(f'models/{model_name}_history.npy', history.history)
+    # # Check for existing weights
+    # if os.path.exists(f'models/{model_name}.h5'):
+    #     model.load_weights(f'models/{model_name}.h5')
+
+    # # fitting the model
+    # history = model.fit(
+    #     train_dataset.batch(8),
+    #     validation_data=test_dataset.batch(8),
+    #     epochs=epochs,
+    #     steps_per_epoch=125,
+    #     max_queue_size=16,
+    #     use_multiprocessing=True,
+    #     workers=8,
+    #     verbose=1,
+    #     callbacks=get_callbacks(model_name)
+    # )
+
+    # # save the history
+    # np.save(f'models/{model_name}_history.npy', history.history)
 
 
 def normalize(img):
@@ -412,18 +421,18 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
-    # train('wbc')
+    train('wbc')
     # evaluate(model_name='quadtree_test')
-    predict()
-    threshold('mask.png')
+    # predict()
+    # threshold('mask.png')
 
-    if cell_type == 'rbc':
-        threshold('edge.png')
-        threshold('edge_mask.png')
-        distance_transform('threshold_edge_mask.png')
-        hough_transform('edge.png')
-    else:
-        distance_transform('threshold_mask.png')
-        hough_transform('mask.png')
+    # if cell_type == 'rbc':
+    #     threshold('edge.png')
+    #     threshold('edge_mask.png')
+    #     distance_transform('threshold_edge_mask.png')
+    #     hough_transform('edge.png')
+    # else:
+    #     distance_transform('threshold_mask.png')
+    #     hough_transform('mask.png')
 
-    component_labeling('distance_transform.png')
+    # component_labeling('distance_transform.png')
