@@ -277,20 +277,6 @@ def slice(imgs, mask,
     return img_chips, mask_chips
 
 
-def get_len(imgs,
-            padding=padding[1],
-            input_size=input_shape[0],
-            output_size=output_shape[0]):
-    center_offset = padding + (output_size / 2)
-    number_of_tiles = 0
-    for i, _ in enumerate(imgs):
-        for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
-            for y in np.arange(center_offset, imgs[i].shape[1] - input_size / 2, output_size):
-                number_of_tiles += 1
-
-    return number_of_tiles
-
-
 def generator(img_list, mask_list, edge_list=None, type='train'):
     if cell_type == 'rbc':
         img, mask, edge = load_data(img_list, mask_list, edge_list)
