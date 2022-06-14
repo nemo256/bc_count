@@ -1,4 +1,15 @@
-# global variables
+##############################################
+#                                            #
+#         Project configuration file         #
+#                                            #
+# Author: Amine Neggazi                      #
+# Email: neggazimedlamine@gmail/com          #
+# Nick: nemo256                              #
+#                                            #
+# Please read bc-count/LICENSE               #
+#                                            #
+##############################################
+
 ''' 
 Cell type can be wither rbc, wbc or plt
 which stands for:

@@ -1,3 +1,17 @@
+##############################################
+#                                            #
+# Main program (later this will be changed)  #
+# for simplicities sake this will only call  # 
+# function from algorithms/<>.py files       # 
+#                                            #
+# Author: Amine Neggazi                      #
+# Email: neggazimedlamine@gmail/com          #
+# Nick: nemo256                              #
+#                                            #
+# Please read bc-count/LICENSE               #
+#                                            #
+##############################################
+
 import glob
 import os
 import cv2

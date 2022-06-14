@@ -1,3 +1,14 @@
+##############################################
+#                                            #
+#           Custom data generator            #
+#                                            #
+# Author: Amine Neggazi                      #
+# Email: neggazimedlamine@gmail/com          #
+# Nick: nemo256                              #
+#                                            #
+# Please read bc-count/LICENSE               #
+#                                            #
+##############################################
 import os
 import json
 

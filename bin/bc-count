@@ -1,3 +1,16 @@
+##############################################
+#                                            #
+#  Executable to count and segment circles   #
+#  from blood cell images                    #
+#                                            #
+# Author: Amine Neggazi                      #
+# Email: neggazimedlamine@gmail/com          #
+# Nick: nemo256                              #
+#                                            #
+# Please read bc-count/LICENSE               #
+#                                            #
+##############################################
+
 #!/usr/bin/env python
 
 print("Hiii, i'm here")

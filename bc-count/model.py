@@ -1,3 +1,15 @@
+##############################################
+#                                            #
+#              DO_U-Net model                #
+#                                            #
+# Author: Amine Neggazi                      #
+# Email: neggazimedlamine@gmail/com          #
+# Nick: nemo256                              #
+#                                            #
+# Please read bc-count/LICENSE               #
+#                                            #
+##############################################
+
 import tensorflow as tf
 import tensorflow_addons as tfa
 
