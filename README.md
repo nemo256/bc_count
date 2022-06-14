@@ -8,8 +8,6 @@ Count red, white blood cells to detect various diseases such as blood cancer (le
 ## Table of Contents
 
 * [Project Structure](#project-structure)
-* [Install](#install)
-* [Usage](#usage)
 * [Develop](#develop)
 * [License](#license)
 
@@ -45,27 +43,6 @@ bc-count/
 |-- TODO.md
 |-- requirements.txt 
 |-- setup.py
-```
-
-## Install
-- Install straight from PyPI using pip:
-```
-$ pip install bc-count
-```
-## Usage
-> Please read `bc-count --help` before using it
-> -o flag is optional (defaults to out/ directory)
-- Count blood cells (-r for red and -w for white):
-```
-$ bc-count -r <blood-cell-image>
-```
-- Predict blood cell image:
-```
-$ bc-count predict -r <blood-cell-image>
-```
-- Train a new model:
-```
-$ bc-count train -r <model-name>
 ```
 
 ## Develop
