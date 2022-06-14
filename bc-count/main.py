@@ -13,7 +13,16 @@ from model import do_unet, get_callbacks
 
 
 def train(model_name='mse', epochs=50):
-    # globing appropriate images, their masks and their edges (rbc)
+    '''
+    This is the train function, so that we can train multiple models
+    according to blood cell types and multiple input shapes aswell.
+    :param model_name --> model weights that we want saved
+    :param epochs --> how many epochs we want the model to be trained
+
+    :return --> saves the model weights under <model_name>.h5 with
+    its respective history file <model_name>_history.npy
+    '''
+
     train_img_list = sorted(glob.glob(f'data/{cell_type}/train/image/*.jpg'))
     test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
     train_mask_list = sorted(glob.glob(f'data/{cell_type}/train/mask/*.jpg'))
@@ -74,6 +83,9 @@ def train(model_name='mse', epochs=50):
 def normalize(img):
     '''
     Normalizes an image
+    :param img --> an input image that we want normalized
+
+    :return np.array --> an output image normalized (as a numpy array)
     '''
     return np.array((img - np.min(img)) / (np.max(img) - np.min(img)))
 
@@ -84,33 +96,47 @@ def get_sizes(img,
               output=output_shape[0]):
     '''
     Get full image sizes (x, y) to rebuilt the full image output
+    :param img --> an input image we want to get its dimensions
+    :param padding --> the default padding used on the test dataset
+    :param input --> the input shape of the image (param: img)
+    :param output --> the output shape of the image (param: img)
+
+    :return couple --> a couple which contains the image dimensions as in (x, y)
     '''
     offset = padding + (output / 2)
     return [(len(np.arange(offset, img[0].shape[0] - input / 2, output)), len(np.arange(offset, img[0].shape[1] - input / 2, output)))]
 
 
-# reshape numpy arrays
 def reshape(img,
             size_x,
             size_y):
     '''
     Reshape the full image output using the original sizes (x, y)
+    :param img --> an input image we want to reshape
+    :param size_x --> the x axis (length) of the input image (param: img)
+    :param size_y --> the y axis (length) of the input image (param: img)
+
+    :return img (numpy array) --> the output image reshaped according to the provided dimensions (size_x, size_y)
     '''
     return img.reshape(size_x, size_y, output_shape[0], output_shape[0], 1)
 
 
-# concatenate images
 def concat(imgs):
     '''
     Concatenate all the output image chips to rebuild the full image
+    :param imgs --> the images that we want to concatenate
+
+    :return full_image --> the concatenation of all the provided images (param: imgs)
     '''
     return cv2.vconcat([cv2.hconcat(im_list) for im_list in imgs[:,:,:,:]])
 
 
-# denoise an image
 def denoise(img):
     '''
     Remove noise from an image
+    :param img --> the input image that we want to denoise (remove the noise)
+
+    :return image --> the denoised output image
     '''
     # read the image
     img = cv2.imread(img)
@@ -118,15 +144,17 @@ def denoise(img):
     return cv2.fastNlMeansDenoising(img, 23, 23, 7, 21)
 
 
-# predict (segment) image and save a sample output
 def predict(img='Im037_0'):
     '''
     Predict (segment) blood cell images using the trained model (do_unet)
+    :param img --> the image we want to predict (from the test/ directory)
+
+    :return --> saves the predicted (segmented blood cell image) under the folder output/
     '''
-    # # Check for existing predictions
-    # if os.path.exists(f'{output_directory}/mask.png'):
-    #     print('Prediction already exists!')
-    #     return
+    # Check for existing predictions
+    if os.path.exists(f'{output_directory}/mask.png'):
+        print('Prediction already exists!')
+        return
 
     test_img = sorted(glob.glob(f'data/{cell_type}/test/image/{img}.jpg'))
     test_mask = sorted(glob.glob(f'data/{cell_type}/test/mask/{img}.jpg'))
@@ -243,10 +271,12 @@ def predict(img='Im037_0'):
     plt.savefig('sample.png')
 
 
-# evaluate model accuracies (mask accuracy and edge accuracy)
 def evaluate(model_name='mse'):
     '''
     Evaluate an already trained model
+    :param model_name --> the model weights that we want to evaluate
+
+    :return --> output the evaluated model weights directly to the screen.
     '''
     test_img_list = sorted(glob.glob(f'data/{cell_type}/test/image/*.jpg'))
     test_mask_list = sorted(glob.glob(f'data/{cell_type}/test/mask/*.jpg'))
@@ -297,8 +327,14 @@ def evaluate(model_name='mse'):
         print(model.evaluate(img_chips, (mask_chips)))
 
 
-# threshold an image using otsu's threshold
 def threshold(img='edge.png'):
+    '''
+    This is the threshold function, which applied an otsu threshold
+    to the input image (param: img)
+    :param img --> the image we want to threshold
+
+    :return --> saves the output thresholded image under the folder output/<cell_type>/threshold_<img>.png
+    '''
     if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
@@ -322,8 +358,14 @@ def threshold(img='edge.png'):
     plt.imsave(f'{output_directory}/threshold_{img}', image, cmap='gray')
     
 
-# count how many cells from the predicted edges
 def hough_transform(img='edge.png'):
+    '''
+    This is the Circle Hough Transform function (CHT), which counts the
+    circles from an input image.
+    :param img --> the input image that we want to count circles from.
+
+    :return --> saves the output image under the folder output/<cell_type>/hough_transform.png
+    '''
     if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
@@ -357,8 +399,13 @@ def hough_transform(img='edge.png'):
     print(f'Hough transform: {len(circles)}')
 
 
-# count how many cells from the predicted edges
 def component_labeling(img='edge.png'):
+    '''
+    This is the Connected Component Labeling (CCL), which labels all the connected objects from an input image
+    :param img --> the input image that we want to apply CCL to.
+
+    :return --> saves the output image under the folder output/<cell_type>/component_labeling.png
+    '''
     if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
@@ -391,8 +438,13 @@ def component_labeling(img='edge.png'):
     print(f'Connected component labeling: {num_labels}')
 
 
-# get a minimal of each cell to help with the counting
 def distance_transform(img='threshold_edge_mask.png'):
+    '''
+    This is the Euclidean Distance Transform function (EDT), which applied the distance transform algorithm to an input image>
+    :param img --> the input image that we want to apply EDT to.
+
+    :return --> saves the output image under the folder output/<cell_type>/distance_transform.png
+    '''
     if not os.path.exists(output_directory + '/' + img):
         print('Image does not exist!')
         return
@@ -412,6 +464,10 @@ def distance_transform(img='threshold_edge_mask.png'):
 
 
 if __name__ == '__main__':
+    '''
+    The main function, which handles all the function call
+    (later on, this will dynamically call functions according user input)
+    '''
     # train('wbc')
     # evaluate(model_name='quadtree_test')
     predict()
