@@ -1,14 +1,14 @@
 - [x] Add combined model of do-u-net with different layers.
 - [x] Add data augmentation with two datasets (optimized dataset with only 10 images with their masks and edge-masks 13 images, and the second dataset is ALL-IDB1 108 images).
 - [x] Add necessary functions from other models (Segnet and U-Net).
-- [-] Prepare trained weights with different loss functions (binary crossentropy, Mean Squared Error MSE, Intersection Over Union IOU...).
+- [ ] Prepare trained weights with different loss functions (binary crossentropy, Mean Squared Error MSE, Intersection Over Union IOU...).
 - [x] Train and test white blood cells.
 - [x] Train and test red blood cells.
 - [x] Train and test platelets.
 - [x] Add unit tests.
 - [x] Finish documenting all functions.
 - [ ] Implement argument parser for deploying the bc-count script.
-- [-] Reorganize main.py (for simplicity, main function will only call function from other files/functions).
+- [ ] Reorganize main.py (for simplicity, main function will only call function from other files/functions).
 - [x] Publish this project to PyPI.
 - [x] Publish a stable python script to PyPI.
 - [ ] Apply final touches to the production script.
