@@ -23,6 +23,13 @@ from config import *
 
 
 def load_image_list(img_files, gray=False):
+    '''
+    This is the load image list function, which loads an enumerate
+    of images (param: img_files)
+    :param img_files --> the input image files which we want to read
+
+    :return imgs --> the images that we read
+    '''
     imgs = []
     if gray:
         for image_file in img_files:
@@ -37,6 +44,13 @@ def load_image_list(img_files, gray=False):
 
 
 def clahe_images(img_list):
+    '''
+    This is the clahe images function, which applies a clahe threshold
+    the input image list.
+    :param img_files --> the input image files which we want to read
+
+    :return img_list --> the output images
+    '''
     for i, img in enumerate(img_list):
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 
@@ -47,6 +61,16 @@ def clahe_images(img_list):
 
 
 def preprocess_data(imgs, mask, edge=None, padding=padding[1]):
+    '''
+    This is the preprocess data function, which adds a padding to 
+    the input images, masks and edges if there are any.
+    :param imgs --> the input list of images.
+    :param mask --> the input list of masks.
+    :param edge --> the input list of edges.
+    :param padding --> the input padding which is going to be applied.
+
+    :return tuple(imgs, mask, edge if exists) --> output images, masks and edges with padding added.
+    '''
     imgs = [np.pad(img, ((padding, padding),
                          (padding, padding), (0, 0)), mode='constant') for img in imgs]
     mask = [np.pad(mask, ((padding, padding),
@@ -62,6 +86,15 @@ def preprocess_data(imgs, mask, edge=None, padding=padding[1]):
 
 
 def load_data(img_list, mask_list, edge_list=None, padding=padding[1]):
+    '''
+    This is the load data function, which will handle image loading and preprocessing.
+    :param img_list --> list of input images
+    :param mask_list --> list of input masks
+    :param edge_list --> list of input edges
+    :param padding --> padding to be applied on preprocessing
+
+    :return tuple(imgs, masks and edges if exists) --> the output preprocessed imgs, masks and edges.
+    '''
     imgs = load_image_list(img_list)
     imgs = clahe_images(imgs)
 
@@ -75,6 +108,14 @@ def load_data(img_list, mask_list, edge_list=None, padding=padding[1]):
 
 
 def aug_lum(image, factor=None):
+    '''
+    This is the augment luminosity function, which we apply to
+    augment the luminosity of an input image.
+    :param image --> the input image we want to augment
+    :param factor --> the factor of luminosity augment (default is 0.5 * random number)
+
+    :return image --> the output luminosity augmented image
+    '''
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsv = hsv.astype(np.float64)
 
@@ -91,6 +132,13 @@ def aug_lum(image, factor=None):
 
 
 def aug_img(image):
+    '''
+    This is the augment colors function, which we apply to
+    augment the colors of an given image.
+    :param image --> the input image we want to augment
+
+    :return image --> the output colors augmented image
+    '''
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsv = hsv.astype(np.float64)
 
@@ -117,6 +165,19 @@ def train_generator(imgs, mask, edge=None,
                     input_size=input_shape[0],
                     output_size=output_shape[0],
                     skip_empty=False):
+    '''
+    This is the train generator function, which generates the train dataset.
+    :param imgs --> the input images
+    :param mask --> the input masks
+    :param edge --> the input edges if there are any (red blood cells only)
+    :param scale_range --> the factor (i, j) of rescaling.
+    :param padding --> the padding which will be applied to each image
+    :param input_size --> the input shape
+    :param output_size --> the output shape
+    :param skip_empty --> skip empty chips (random if not set)
+
+    :return chips --> yields an image, mask and edge chip each time it gets executed (called)
+    '''
     if scale_range is not None:
         scale_range = [1 - scale_range, 1 + scale_range]
     while True:
@@ -209,6 +270,17 @@ def test_chips(imgs, mask,
                padding=padding[1],
                input_size=input_shape[0],
                output_size=output_shape[0]):
+    '''
+    This is the test chips function, which generates the test dataset.
+    :param imgs --> the input images
+    :param mask --> the input masks
+    :param edge --> the input edges if there are any (red blood cells only)
+    :param padding --> the padding which will be applied to each image
+    :param input_size --> the input shape
+    :param output_size --> the output shape
+
+    :return chips --> yields an image, mask and edge chip each time it gets executed (called)
+    '''
     center_offset = padding + (output_size / 2)
     for i, _ in enumerate(imgs):
         for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
@@ -245,6 +317,17 @@ def slice(imgs, mask,
           padding=padding[1],
           input_size=input_shape[0],
           output_size=output_shape[0]):
+    '''
+    This is the slice function, which slices each image into image chips.
+    :param imgs --> the input images
+    :param mask --> the input masks
+    :param edge --> the input edges if there are any (red blood cells only)
+    :param padding --> the padding which will be applied to each image
+    :param input_size --> the input shape
+    :param output_size --> the output shape
+
+    :return list tuple (list, list, list) --> the tuple list of output (image, mask and edge chips)
+    '''
     img_chips = []
     mask_chips = []
     if edge is not None:
@@ -290,6 +373,15 @@ def slice(imgs, mask,
 
 
 def generator(img_list, mask_list, edge_list=None, type='train'):
+    '''
+    This is the generator function, which provides the list of image, mask and edge lists to the train generator and test chips functions.
+    :param img_list --> the input list of images
+    :param mask_list --> the input list of masks
+    :param edge_list --> the input list of edges if there are any
+    :param type --> can be either train or test, used to determine which generator function is to be called
+
+    :return tensorflow dataset --> the output generated functions fed to tensorflow
+    '''
     if cell_type == 'rbc':
         img, mask, edge = load_data(img_list, mask_list, edge_list)
     elif cell_type == 'wbc' or cell_type == 'plt':

@@ -8,5 +8,6 @@
 - [x] Add unit tests
 - [ ] Finish documenting all functions
 - [ ] Implement argument parser for deploying the bc-count script
+- [-] Reorganize main.py (for simplicity, main function will only call function from other files/functions)
 - [x] Publish this project to PyPI.
 - [x] Publish a stable python script to PyPI.
