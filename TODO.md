@@ -6,7 +6,7 @@
 - [x] Train and test red blood cells
 - [x] Train and test platelets
 - [x] Add unit tests
-- [ ] Finish documenting all functions
+- [x] Finish documenting all functions
 - [ ] Implement argument parser for deploying the bc-count script
 - [-] Reorganize main.py (for simplicity, main function will only call function from other files/functions)
 - [x] Publish this project to PyPI.
