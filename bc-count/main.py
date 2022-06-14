@@ -482,8 +482,8 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    # train('wbc')
-    # evaluate(model_name='quadtree_test')
+    # train('rbc')
+    # evaluate(model_name='rbc')
     predict()
     threshold('mask.png')
 
