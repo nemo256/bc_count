@@ -26,7 +26,7 @@ import data
 from model import do_unet, get_callbacks
 
 
-def train(model_name='mse', epochs=50):
+def train(model_name='mse', epochs=120):
     '''
     This is the train function, so that we can train multiple models
     according to blood cell types and multiple input shapes aswell.
