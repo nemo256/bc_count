@@ -1,7 +1,7 @@
 ##############################################
 #                                            #
-#  Executable to count and segment circles   #
-#  from blood cell images                    #
+# Executable to count and segment circles    #
+# from blood cell images                     #
 #                                            #
 # Author: Amine Neggazi                      #
 # Email: neggazimedlamine@gmail/com          #
@@ -13,4 +13,4 @@
 
 #!/usr/bin/env python
 
-print("Hiii, i'm here")
+print("Testing production script!")
