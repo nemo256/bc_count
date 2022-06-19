@@ -26,7 +26,7 @@ import data
 from model import do_unet, segnet, get_callbacks
 
 
-def train(model_name='mse', epochs=40):
+def train(model_name='mse', epochs=50):
     '''
     This is the train function, so that we can train multiple models
     according to blood cell types and multiple input shapes aswell.
@@ -491,7 +491,7 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('wbc_segnet')
+    train('wbc_segnet', epochs=60)
     # evaluate(model_name='rbc')
     # predict()
     # threshold('mask.png')
