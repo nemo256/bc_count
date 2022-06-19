@@ -23,7 +23,7 @@ from scipy import ndimage
 # custom imports
 from config import *
 import data
-from model import do_unet, get_callbacks
+from model import do_unet, segnet, get_callbacks
 
 
 def train(model_name='mse', epochs=40):
@@ -181,7 +181,7 @@ def predict(img='Im037_0'):
         return
 
     # initialize do_unet
-    model = do_unet()
+    model = segnet()
 
     # Check for existing weights
     if os.path.exists(f'models/{model_name}.h5'):
@@ -482,7 +482,7 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('plt')
+    train('wbc')
     # evaluate(model_name='rbc')
     # predict()
     # threshold('mask.png')
@@ -497,3 +497,4 @@ if __name__ == '__main__':
     #     hough_transform('mask.png')
 
     # component_labeling('distance_transform.png')
+

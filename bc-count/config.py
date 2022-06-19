@@ -17,11 +17,19 @@ which stands for:
     wbc --> White blood cells
     plt --> Platelets
 '''
-cell_type        = 'plt'             # rbc, wbc or plt
-model_name       = cell_type
-input_shape      = (188, 188, 3)
-output_shape     = (100, 100, 1)
-padding          = [200, 100]
+cell_type  = 'rbc'             # rbc, wbc or plt
+model_type = 'segnet'
+
+if model_type == 'do-u-net':
+    model_name   = cell_type
+    input_shape  = (188, 188, 3)
+    output_shape = (100, 100, 1)
+else:
+    model_name   = cell_type + '_segnet'
+    input_shape  = (128, 128, 3)
+    output_shape = (128, 128, 1)
+
+padding = [200, 100]
 if cell_type == 'rbc':
     output_directory = 'output/rbc'
 elif cell_type == 'wbc':
