@@ -154,7 +154,7 @@ def do_unet():
                       metrics='accuracy')
     return model
 
-def segnet():
+def segnet2():
     inputs = tf.keras.layers.Input((128, 128, 3))
 
     # encoder
@@ -215,6 +215,76 @@ def segnet():
 
     if cell_type == 'rbc':
         out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder5)
+        model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
+    elif cell_type == 'wbc' or cell_type == 'plt':
+        model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
+
+    opt = tf.optimizers.Adam(learning_rate=0.0001)
+
+    if cell_type == 'rbc':
+        model.compile(loss='mse',
+                      loss_weights=[0.1, 0.9],
+                      optimizer=opt,
+                      metrics='accuracy')
+    elif cell_type == 'wbc' or cell_type == 'plt':
+        model.compile(loss='mse',
+                      optimizer=opt,
+                      metrics='accuracy')
+    return model
+
+
+def segnet():
+    inputs = tf.keras.layers.Input((128, 128, 3))
+
+    # encoder
+    filters = 64
+    encoder1 = conv_bn(filters, inputs, model_type)
+    encoder1 = conv_bn(filters, encoder1, model_type)
+    pool1, mask1 = tf.nn.max_pool_with_argmax(encoder1, 3, 2, padding="SAME")
+
+    filters *= 2
+    encoder2 = conv_bn(filters, pool1, model_type)
+    encoder2 = conv_bn(filters, encoder2, model_type)
+    pool2, mask2 = tf.nn.max_pool_with_argmax(encoder2, 3, 2, padding="SAME")
+
+    filters *= 2
+    encoder3 = conv_bn(filters, pool2, model_type)
+    encoder3 = conv_bn(filters, encoder3, model_type)
+    encoder3 = conv_bn(filters, encoder3, model_type)
+    pool3, mask3 = tf.nn.max_pool_with_argmax(encoder3, 3, 2, padding="SAME")
+
+    filters *= 2
+    encoder4 = conv_bn(filters, pool3, model_type)
+    encoder4 = conv_bn(filters, encoder4, model_type)
+    encoder4 = conv_bn(filters, encoder4, model_type)
+    pool4, mask4 = tf.nn.max_pool_with_argmax(encoder4, 3, 2, padding="SAME")
+
+    # decoder
+    unpool1 = tfa.layers.MaxUnpooling2D()(pool4, mask4)
+    decoder1 = conv_bn(filters, unpool1, model_type)
+    decoder1 = conv_bn(filters, decoder1, model_type)
+    decoder1 = conv_bn(filters, decoder1, model_type)
+
+    unpool2 = tfa.layers.MaxUnpooling2D()(decoder1, mask4)
+    decoder2 = conv_bn(filters, unpool2, model_type)
+    decoder2 = conv_bn(filters, decoder2, model_type)
+    decoder2 = conv_bn(filters/2, decoder2, model_type)
+
+    filters /= 2
+    unpool3 = tfa.layers.MaxUnpooling2D()(decoder2, mask3)
+    decoder3 = conv_bn(filters, unpool3, model_type)
+    decoder3 = conv_bn(filters, decoder3, model_type)
+    decoder3 = conv_bn(filters/2, decoder3, model_type)
+
+    filters /= 2
+    unpool4 = tfa.layers.MaxUnpooling2D()(decoder3, mask2)
+    decoder4 = conv_bn(filters, unpool4, model_type)
+    decoder4 = conv_bn(filters/2, decoder4, model_type)
+
+    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder4)
+
+    if cell_type == 'rbc':
+        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder4)
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
     elif cell_type == 'wbc' or cell_type == 'plt':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
