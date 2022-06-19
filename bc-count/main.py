@@ -255,18 +255,18 @@ def predict(img='Im037_0'):
         plt.imsave(f'{output_directory}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
 
-    if model_type == 'segnet':
-        # denoise all the output images
-        new_mask  = denoise(f'{output_directory}/mask.png')
-        if cell_type == 'rbc':
-            new_edge  = denoise(f'{output_directory}/edge.png')
-            edge_mask = denoise(f'{output_directory}/edge_mask.png')
+    # if model_type == 'segnet':
+    #     # denoise all the output images
+    #     new_mask  = denoise(f'{output_directory}/mask.png')
+    #     if cell_type == 'rbc':
+    #         new_edge  = denoise(f'{output_directory}/edge.png')
+    #         edge_mask = denoise(f'{output_directory}/edge_mask.png')
 
-        # save predicted mask and edge after denoising
-        plt.imsave(f'{output_directory}/mask.png', new_mask)
-        if cell_type == 'rbc':
-            plt.imsave(f'{output_directory}/edge.png', new_edge)
-            plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
+    #     # save predicted mask and edge after denoising
+    #     plt.imsave(f'{output_directory}/mask.png', new_mask)
+    #     if cell_type == 'rbc':
+    #         plt.imsave(f'{output_directory}/edge.png', new_edge)
+    #         plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
 
     # organize results into one figure
     if cell_type == 'rbc':

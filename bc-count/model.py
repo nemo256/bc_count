@@ -42,7 +42,7 @@ def conv_bn(filters,
         kernel=3
         activation='relu'
         strides=(1, 1)
-        padding='same'
+        padding='valid'
         type='normal'
 
     if type == 'transpose':
@@ -240,18 +240,18 @@ def segnet():
     filters = 64
     encoder1 = conv_bn(filters, inputs, model_type)
     encoder1 = conv_bn(filters, encoder1, model_type)
-    pool1, mask1 = tf.nn.max_pool_with_argmax(encoder1, 3, 2, padding="SAME")
+    pool1, mask1 = tf.nn.max_pool_with_argmax(encoder1, 3, 2, padding="VALID")
 
     filters *= 2
     encoder2 = conv_bn(filters, pool1, model_type)
     encoder2 = conv_bn(filters, encoder2, model_type)
-    pool2, mask2 = tf.nn.max_pool_with_argmax(encoder2, 3, 2, padding="SAME")
+    pool2, mask2 = tf.nn.max_pool_with_argmax(encoder2, 3, 2, padding="VALID")
 
     filters *= 2
     encoder3 = conv_bn(filters, pool2, model_type)
     encoder3 = conv_bn(filters, encoder3, model_type)
     encoder3 = conv_bn(filters, encoder3, model_type)
-    pool3, mask3 = tf.nn.max_pool_with_argmax(encoder3, 3, 2, padding="SAME")
+    pool3, mask3 = tf.nn.max_pool_with_argmax(encoder3, 3, 2, padding="VALID")
 
     # decoder
     filters /= 2
