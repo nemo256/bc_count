@@ -67,7 +67,10 @@ def train(model_name='mse', epochs=40):
     )
 
     # initializing the do_unet model
-    model = do_unet()
+    if model_type == 'do-u-net':
+        model = do_unet()
+    else:
+        model = segnet()
 
     # create models directory if it does not exist
     if not os.path.exists('models/'):
@@ -180,8 +183,11 @@ def predict(img='Im037_0'):
         print('Invalid blood cell type!\n')
         return
 
-    # initialize do_unet
-    model = segnet()
+    # initializing the do_unet model
+    if model_type == 'do-u-net':
+        model = do_unet()
+    else:
+        model = segnet()
 
     # Check for existing weights
     if os.path.exists(f'models/{model_name}.h5'):
@@ -302,8 +308,11 @@ def evaluate(model_name='mse'):
         print('Invalid blood cell type!\n')
         return
 
-    # initialize do_unet
-    model = do_unet()
+    # initializing the do_unet model
+    if model_type == 'do-u-net':
+        model = do_unet()
+    else:
+        model = segnet()
 
     # load weights
     if os.path.exists(f'models/{model_name}.h5'):
