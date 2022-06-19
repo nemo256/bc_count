@@ -72,29 +72,31 @@ def train(model_name='mse', epochs=50):
     else:
         model = segnet()
 
-    # create models directory if it does not exist
-    if not os.path.exists('models/'):
-        os.makedirs('models/')
+    model.summary()
 
-    # Check for existing weights
-    if os.path.exists(f'models/{model_name}.h5'):
-        model.load_weights(f'models/{model_name}.h5')
+    # # create models directory if it does not exist
+    # if not os.path.exists('models/'):
+    #     os.makedirs('models/')
 
-    # fitting the model
-    history = model.fit(
-        train_dataset.batch(8),
-        validation_data=test_dataset.batch(8),
-        epochs=epochs,
-        steps_per_epoch=125,
-        max_queue_size=16,
-        use_multiprocessing=True,
-        workers=8,
-        verbose=1,
-        callbacks=get_callbacks(model_name)
-    )
+    # # Check for existing weights
+    # if os.path.exists(f'models/{model_name}.h5'):
+    #     model.load_weights(f'models/{model_name}.h5')
 
-    # save the history
-    np.save(f'models/{model_name}_history.npy', history.history)
+    # # fitting the model
+    # history = model.fit(
+    #     train_dataset.batch(8),
+    #     validation_data=test_dataset.batch(8),
+    #     epochs=epochs,
+    #     steps_per_epoch=125,
+    #     max_queue_size=16,
+    #     use_multiprocessing=True,
+    #     workers=8,
+    #     verbose=1,
+    #     callbacks=get_callbacks(model_name)
+    # )
+
+    # # save the history
+    # np.save(f'models/{model_name}_history.npy', history.history)
 
 
 def normalize(img):

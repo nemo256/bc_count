@@ -36,7 +36,7 @@ def conv_bn(filters,
     :param padding --> model padding (can be valid or same)
     :param type --> to indicate if it is a transpose or normal convolution
 
-    :return --> returns the output after the convolutions.
+    :return --> returns the output after the convolution and batch normalization and activation.
     '''
     if model_type == 'segnet':
         kernel=3
@@ -233,6 +233,10 @@ def segnet2():
     return model
 
 
+
+
+
+
 def segnet():
     inputs = tf.keras.layers.Input((128, 128, 3))
 
@@ -253,27 +257,47 @@ def segnet():
     encoder3 = conv_bn(filters, encoder3, model_type)
     pool3, mask3 = tf.nn.max_pool_with_argmax(encoder3, 3, 2, padding="VALID")
 
+    filters *= 2
+    encoder4 = conv_bn(filters, pool3, model_type)
+    encoder4 = conv_bn(filters, encoder4, model_type)
+    encoder4 = conv_bn(filters, encoder4, model_type)
+    pool4, mask4 = tf.nn.max_pool_with_argmax(encoder4, 3, 2, padding="VALID")
+
+    encoder5 = conv_bn(filters, pool4, model_type)
+    encoder5 = conv_bn(filters, encoder5, model_type)
+    encoder5 = conv_bn(filters, encoder5, model_type)
+    pool5, mask5 = tf.nn.max_pool_with_argmax(encoder5, 3, 2, padding="VALID")
+
     # decoder
-    filters /= 2
-    unpool1 = tfa.layers.MaxUnpooling2D()(pool3, mask3)
+    unpool1 = tfa.layers.MaxUnpooling2D()(pool5, mask5)
     decoder1 = conv_bn(filters, unpool1, model_type)
     decoder1 = conv_bn(filters, decoder1, model_type)
     decoder1 = conv_bn(filters, decoder1, model_type)
 
-    filters /= 2
-    unpool2 = tfa.layers.MaxUnpooling2D()(decoder1, mask2)
+    unpool2 = tfa.layers.MaxUnpooling2D()(decoder1, mask4)
     decoder2 = conv_bn(filters, unpool2, model_type)
     decoder2 = conv_bn(filters, decoder2, model_type)
+    decoder2 = conv_bn(filters/2, decoder2, model_type)
 
     filters /= 2
-    unpool3 = tfa.layers.MaxUnpooling2D()(decoder2, mask1)
+    unpool3 = tfa.layers.MaxUnpooling2D()(decoder2, mask3)
     decoder3 = conv_bn(filters, unpool3, model_type)
     decoder3 = conv_bn(filters, decoder3, model_type)
+    decoder3 = conv_bn(filters/2, decoder3, model_type)
 
-    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder3)
+    filters /= 2
+    unpool4 = tfa.layers.MaxUnpooling2D()(decoder3, mask2)
+    decoder4 = conv_bn(filters, unpool4, model_type)
+    decoder4 = conv_bn(filters/2, decoder4, model_type)
+
+    filters /= 2
+    unpool5 = tfa.layers.MaxUnpooling2D()(decoder4, mask1)
+    decoder5 = conv_bn(filters, unpool5, model_type)
+
+    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder5)
 
     if cell_type == 'rbc':
-        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
+        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder5)
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
     elif cell_type == 'wbc' or cell_type == 'plt':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
