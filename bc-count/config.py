@@ -17,7 +17,7 @@ which stands for:
     wbc --> White blood cells
     plt --> Platelets
 '''
-cell_type  = 'rbc'              # rbc, wbc or plt
+cell_type  = 'rbc'             # rbc, wbc or plt
 model_type = 'segnet'          # do_unet or segnet
 
 if model_type == 'do_unet':
@@ -26,8 +26,8 @@ if model_type == 'do_unet':
     output_shape = (100, 100, 1)
 else:
     model_name   = cell_type + '_segnet'
-    input_shape  = (512, 512, 3)
-    output_shape = (110, 110, 1)
+    input_shape  = (128, 128, 3)
+    output_shape = (128, 128, 1)
 
 padding = [200, 100]
 output_directory = 'output/' + model_type + '/' + cell_type

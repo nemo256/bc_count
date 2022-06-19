@@ -255,18 +255,18 @@ def predict(img='Im037_0'):
         plt.imsave(f'{output_directory}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
 
-    # if model_type == 'segnet':
-    #     # denoise all the output images
-    #     new_mask  = denoise(f'{output_directory}/mask.png')
-    #     if cell_type == 'rbc':
-    #         new_edge  = denoise(f'{output_directory}/edge.png')
-    #         edge_mask = denoise(f'{output_directory}/edge_mask.png')
+    if model_type == 'segnet':
+        # denoise all the output images
+        new_mask  = denoise(f'{output_directory}/mask.png')
+        if cell_type == 'rbc':
+            new_edge  = denoise(f'{output_directory}/edge.png')
+            edge_mask = denoise(f'{output_directory}/edge_mask.png')
 
-    #     # save predicted mask and edge after denoising
-    #     plt.imsave(f'{output_directory}/mask.png', new_mask)
-    #     if cell_type == 'rbc':
-    #         plt.imsave(f'{output_directory}/edge.png', new_edge)
-    #         plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
+        # save predicted mask and edge after denoising
+        plt.imsave(f'{output_directory}/mask.png', new_mask)
+        if cell_type == 'rbc':
+            plt.imsave(f'{output_directory}/edge.png', new_edge)
+            plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
 
     # organize results into one figure
     if cell_type == 'rbc':
@@ -506,19 +506,19 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('plt_segnet_test', epochs=50)
+    # train('plt_segnet', epochs=50)
     # evaluate(model_name='rbc')
-    # predict()
-    # threshold('mask.png')
+    predict()
+    threshold('mask.png')
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png')
-    #     threshold('edge_mask.png')
-    #     distance_transform('threshold_edge_mask.png')
-    #     hough_transform('edge.png')
-    # else:
-    #     distance_transform('threshold_mask.png')
-    #     hough_transform('mask.png')
+    if cell_type == 'rbc':
+        threshold('edge.png')
+        threshold('edge_mask.png')
+        distance_transform('threshold_edge_mask.png')
+        hough_transform('edge.png')
+    else:
+        distance_transform('threshold_mask.png')
+        hough_transform('mask.png')
 
-    # component_labeling('distance_transform.png')
+    component_labeling('distance_transform.png')
 
