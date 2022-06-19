@@ -253,38 +253,27 @@ def segnet():
     encoder3 = conv_bn(filters, encoder3, model_type)
     pool3, mask3 = tf.nn.max_pool_with_argmax(encoder3, 3, 2, padding="SAME")
 
-    filters *= 2
-    encoder4 = conv_bn(filters, pool3, model_type)
-    encoder4 = conv_bn(filters, encoder4, model_type)
-    encoder4 = conv_bn(filters, encoder4, model_type)
-    pool4, mask4 = tf.nn.max_pool_with_argmax(encoder4, 3, 2, padding="SAME")
-
     # decoder
-    unpool1 = tfa.layers.MaxUnpooling2D()(pool4, mask4)
+    filters /= 2
+    unpool1 = tfa.layers.MaxUnpooling2D()(pool3, mask3)
     decoder1 = conv_bn(filters, unpool1, model_type)
     decoder1 = conv_bn(filters, decoder1, model_type)
     decoder1 = conv_bn(filters, decoder1, model_type)
 
-    unpool2 = tfa.layers.MaxUnpooling2D()(decoder1, mask4)
+    filters /= 2
+    unpool2 = tfa.layers.MaxUnpooling2D()(decoder1, mask2)
     decoder2 = conv_bn(filters, unpool2, model_type)
     decoder2 = conv_bn(filters, decoder2, model_type)
-    decoder2 = conv_bn(filters/2, decoder2, model_type)
 
     filters /= 2
-    unpool3 = tfa.layers.MaxUnpooling2D()(decoder2, mask3)
+    unpool3 = tfa.layers.MaxUnpooling2D()(decoder2, mask1)
     decoder3 = conv_bn(filters, unpool3, model_type)
     decoder3 = conv_bn(filters, decoder3, model_type)
-    decoder3 = conv_bn(filters/2, decoder3, model_type)
 
-    filters /= 2
-    unpool4 = tfa.layers.MaxUnpooling2D()(decoder3, mask2)
-    decoder4 = conv_bn(filters, unpool4, model_type)
-    decoder4 = conv_bn(filters/2, decoder4, model_type)
-
-    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder4)
+    out_mask = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='mask')(decoder3)
 
     if cell_type == 'rbc':
-        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder4)
+        out_edge = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid', name='edge')(decoder3)
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask, out_edge))
     elif cell_type == 'wbc' or cell_type == 'plt':
         model = tf.keras.models.Model(inputs=inputs, outputs=(out_mask))
@@ -301,3 +290,4 @@ def segnet():
                       optimizer=opt,
                       metrics='accuracy')
     return model
+
