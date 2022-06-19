@@ -17,7 +17,7 @@ which stands for:
     wbc --> White blood cells
     plt --> Platelets
 '''
-cell_type  = 'rbc'             # rbc, wbc or plt
+cell_type  = 'wbc'             # rbc, wbc or plt
 model_type = 'segnet'
 
 if model_type == 'do-u-net':
