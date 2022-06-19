@@ -1,6 +1,8 @@
 ##############################################
 #                                            #
-#              DO_U-Net model                #
+#                 DO-U-Net                   #
+#                   and                      #
+#                 DO-SegNet                  #
 #                                            #
 # Author: Amine Neggazi                      #
 # Email: neggazimedlamine@gmail/com          #

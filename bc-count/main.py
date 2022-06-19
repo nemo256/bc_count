@@ -67,7 +67,7 @@ def train(model_name='mse', epochs=50):
     )
 
     # initializing the do_unet model
-    if model_type == 'do-u-net':
+    if model_type == 'do_unet':
         model = do_unet()
     else:
         model = segnet()
@@ -184,7 +184,7 @@ def predict(img='Im037_0'):
         return
 
     # initializing the do_unet model
-    if model_type == 'do-u-net':
+    if model_type == 'do_unet':
         model = do_unet()
     else:
         model = segnet()
@@ -255,6 +255,19 @@ def predict(img='Im037_0'):
         plt.imsave(f'{output_directory}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
 
+    if model_type == 'segnet':
+        # denoise all the output images
+        new_mask  = denoise(f'{output_directory}/mask.png')
+        if cell_type == 'rbc':
+            new_edge  = denoise(f'{output_directory}/edge.png')
+            edge_mask = denoise(f'{output_directory}/edge_mask.png')
+
+        # save predicted mask and edge after denoising
+        plt.imsave(f'{output_directory}/mask.png', new_mask)
+        if cell_type == 'rbc':
+            plt.imsave(f'{output_directory}/edge.png', new_edge)
+            plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
+
     # organize results into one figure
     if cell_type == 'rbc':
         fig = plt.figure(figsize=(25, 12), dpi=80)
@@ -309,7 +322,7 @@ def evaluate(model_name='mse'):
         return
 
     # initializing the do_unet model
-    if model_type == 'do-u-net':
+    if model_type == 'do_unet':
         model = do_unet()
     else:
         model = segnet()
@@ -397,11 +410,14 @@ def hough_transform(img='edge.png'):
     image = cv2.imread(f'{output_directory}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
     # apply hough circles
     if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
-    elif cell_type == 'wbc' or cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
+    elif cell_type == 'wbc':
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=21, maxRadius=120, minRadius=48, param1=18, param2=15)
+    elif cell_type == 'plt':
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, .5, minDist=25, maxRadius=20, minRadius=10, param1=18, param2=12)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -417,9 +433,8 @@ def hough_transform(img='edge.png'):
         # save the output image
         plt.imsave(f'{output_directory}/hough_transform.png',
                    np.hstack([img, output]))
-
-    # show the hough_transform results
-    print(f'Hough transform: {len(circles)}')
+        # show the hough_transform results
+        print(f'Hough transform: {len(circles)}')
 
 
 def component_labeling(img='edge.png'):
@@ -491,19 +506,19 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('plt_segnet', epochs=60)
+    # train('plt_segnet', epochs=60)
     # evaluate(model_name='rbc')
-    # predict()
-    # threshold('mask.png')
+    predict()
+    threshold('mask.png')
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png')
-    #     threshold('edge_mask.png')
-    #     distance_transform('threshold_edge_mask.png')
-    #     hough_transform('edge.png')
-    # else:
-    #     distance_transform('threshold_mask.png')
-    #     hough_transform('mask.png')
+    if cell_type == 'rbc':
+        threshold('edge.png')
+        threshold('edge_mask.png')
+        distance_transform('threshold_edge_mask.png')
+        hough_transform('edge.png')
+    else:
+        distance_transform('threshold_mask.png')
+        hough_transform('mask.png')
 
-    # component_labeling('distance_transform.png')
+    component_labeling('distance_transform.png')
 

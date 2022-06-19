@@ -17,10 +17,10 @@ which stands for:
     wbc --> White blood cells
     plt --> Platelets
 '''
-cell_type  = 'plt'             # rbc, wbc or plt
-model_type = 'segnet'
+cell_type  = 'plt'              # rbc, wbc or plt
+model_type = 'do_unet'          # do_unet or segnet
 
-if model_type == 'do-u-net':
+if model_type == 'do_unet':
     model_name   = cell_type
     input_shape  = (188, 188, 3)
     output_shape = (100, 100, 1)
@@ -30,11 +30,7 @@ else:
     output_shape = (128, 128, 1)
 
 padding = [200, 100]
-if cell_type == 'rbc':
-    output_directory = 'output/rbc'
-elif cell_type == 'wbc':
-    output_directory = 'output/wbc'
-elif cell_type == 'plt':
-    output_directory = 'output/plt'
-else:
-    print('Invalid blood cell type!\n')
+output_directory = 'output/' + model_type + '/' + cell_type
+
+if not cell_type in ['rbc', 'wbc', 'plt']:
+    print('Invalid cell type!')
