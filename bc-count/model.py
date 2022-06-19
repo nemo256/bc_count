@@ -238,7 +238,7 @@ def segnet2():
 
 
 def segnet():
-    inputs = tf.keras.layers.Input((128, 128, 3))
+    inputs = tf.keras.layers.Input((512, 512, 3))
 
     # encoder
     filters = 64
