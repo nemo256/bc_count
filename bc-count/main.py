@@ -161,7 +161,7 @@ def denoise(img):
     return cv2.fastNlMeansDenoising(img, 23, 23, 7, 21)
 
 
-def predict(img='Im037_0'):
+def predict(imgName='Im037_0'):
     '''
     Predict (segment) blood cell images using the trained model (do_unet)
     :param img --> the image we want to predict (from the test/ directory)
@@ -169,19 +169,13 @@ def predict(img='Im037_0'):
     :return --> saves the predicted (segmented blood cell image) under the folder output/
     '''
     # Check for existing predictions
-    if os.path.exists(f'{output_directory}/mask.png'):
+    if not os.path.exists(f'{output_directory}/{imgName}'):
+        os.makedirs(f'{output_directory}/{imgName}', exist_ok=True)
+    else:
         print('Prediction already exists!')
         return
 
-    test_img = sorted(glob.glob(f'data/{cell_type}/test/image/{img}.jpg'))
-    test_mask = sorted(glob.glob(f'data/{cell_type}/test/mask/{img}.jpg'))
-    if cell_type == 'rbc':
-        test_edge = sorted(glob.glob(f'data/{cell_type}/test/edge/{img}.jpg'))
-    elif cell_type == 'wbc' or cell_type == 'plt':
-        test_edge = None
-    else:
-        print('Invalid blood cell type!\n')
-        return
+    test_img = sorted(glob.glob(f'data/ALL-IDB1/{imgName}.jpg'))
 
     # initializing the do_unet model
     if model_type == 'do_unet':
@@ -194,30 +188,18 @@ def predict(img='Im037_0'):
         model.load_weights(f'models/{model_name}.h5')
 
     # load test data
-    if cell_type == 'rbc':
-        img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
+    img = data.load_image(test_img, padding=padding[0])
 
-        img_chips, mask_chips, edge_chips = data.slice(
-            img,
-            mask,
-            edge,
-            padding=padding[1],
-            input_size=input_shape[0],
-            output_size=output_shape[0],
-        )
-    else:
-        img, mask = data.load_data(test_img, test_mask, padding=padding[0])
-
-        img_chips, mask_chips = data.slice(
-            img,
-            mask,
-            padding=padding[1],
-            input_size=input_shape[0],
-            output_size=output_shape[0],
-        )
+    img_chips = data.slice_image(
+        img,
+        padding=padding[1],
+        input_size=input_shape[0],
+        output_size=output_shape[0],
+    )
 
     # segment all image chips
     output = model.predict(img_chips)
+
     if cell_type == 'rbc':
         new_mask_chips = np.array(output[0])
         new_edge_chips = np.array(output[1])
@@ -242,66 +224,24 @@ def predict(img='Im037_0'):
     if cell_type == 'rbc':
         new_edge = concat(new_edge_chips)
     
-    # create output directories if it does not exist
-    if not os.path.exists('output/'):
-        os.makedirs('output/')
-
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
-
     # save predicted mask and edge
-    plt.imsave(f'{output_directory}/mask.png', new_mask)
+    plt.imsave(f'{output_directory}/{imgName}/mask.png', new_mask)
     if cell_type == 'rbc':
-        plt.imsave(f'{output_directory}/edge.png', new_edge)
-        plt.imsave(f'{output_directory}/edge_mask.png', new_mask - new_edge)
+        plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
+        plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', new_mask - new_edge)
 
     if model_type == 'segnet':
         # denoise all the output images
-        new_mask  = denoise(f'{output_directory}/mask.png')
+        new_mask  = denoise(f'{output_directory}/{imgName}/mask.png')
         if cell_type == 'rbc':
-            new_edge  = denoise(f'{output_directory}/edge.png')
-            edge_mask = denoise(f'{output_directory}/edge_mask.png')
+            new_edge  = denoise(f'{output_directory}/{imgName}/edge.png')
+            edge_mask = denoise(f'{output_directory}/{imgName}/edge_mask.png')
 
         # save predicted mask and edge after denoising
-        plt.imsave(f'{output_directory}/mask.png', new_mask)
+        plt.imsave(f'{output_directory}/{imgName}/mask.png', new_mask)
         if cell_type == 'rbc':
-            plt.imsave(f'{output_directory}/edge.png', new_edge)
-            plt.imsave(f'{output_directory}/edge_mask.png', edge_mask)
-
-    # organize results into one figure
-    if cell_type == 'rbc':
-        fig = plt.figure(figsize=(25, 12), dpi=80)
-        fig.subplots_adjust(hspace=0.1, wspace=0.1)
-        ax  = fig.add_subplot(2, 3, 1)
-        ax.set_title('Test image')
-        ax.imshow(np.array(img)[0,:,:,:])
-        ax  = fig.add_subplot(2, 3, 2)
-        ax.set_title('Test mask')
-        ax.imshow(np.array(mask)[0,:,:])
-        ax  = fig.add_subplot(2, 3, 3)
-        ax.set_title('Test edge')
-        ax.imshow(np.array(edge)[0,:,:])
-        ax  = fig.add_subplot(2, 3, 5)
-        ax.set_title('Predicted mask')
-        ax.imshow(new_mask)
-        ax  = fig.add_subplot(2, 3, 6)
-        ax.set_title('Predicted edge')
-        ax.imshow(new_edge)
-    elif cell_type == 'wbc' or cell_type == 'plt':
-        fig = plt.figure(figsize=(25, 12), dpi=80)
-        fig.subplots_adjust(hspace=0.1, wspace=0.1)
-        ax  = fig.add_subplot(2, 2, 1)
-        ax.set_title('Test image')
-        ax.imshow(np.array(img)[0,:,:,:])
-        ax  = fig.add_subplot(2, 2, 2)
-        ax.set_title('Test mask')
-        ax.imshow(np.array(mask)[0,:,:])
-        ax  = fig.add_subplot(2, 2, 4)
-        ax.set_title('Predicted mask')
-        ax.imshow(new_mask)
-
-    # save the figure as a sample output
-    plt.savefig('sample.png')
+            plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
+            plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', edge_mask)
 
 
 def evaluate(model_name='mse'):
@@ -363,7 +303,7 @@ def evaluate(model_name='mse'):
         print(model.evaluate(img_chips, (mask_chips)))
 
 
-def threshold(img='edge.png'):
+def threshold(img='edge.png', imgName='Im037_0'):
     '''
     This is the threshold function, which applied an otsu threshold
     to the input image (param: img)
@@ -371,30 +311,30 @@ def threshold(img='edge.png'):
 
     :return --> saves the output thresholded image under the folder output/<cell_type>/threshold_<img>.png
     '''
-    if not os.path.exists(output_directory + '/' + img):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
         print('Image does not exist!')
         return
 
     # substract if img is edge_mask
     if img == 'edge_mask.png':
-        mask = cv2.imread(f'{output_directory}/threshold_mask.png')
-        edge = cv2.imread(f'{output_directory}/threshold_edge.png')
+        mask = cv2.imread(f'{output_directory}/{imgName}/threshold_mask.png')
+        edge = cv2.imread(f'{output_directory}/{imgName}/threshold_edge.png')
 
         # substract mask - edge
         image = mask - edge
     else:
         # getting the input image
-        image = cv2.imread(f'{output_directory}/{img}')
+        image = cv2.imread(f'{output_directory}/{imgName}/{img}')
 
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         otsu_threshold, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU,)
 
     # save the resulting thresholded image
-    plt.imsave(f'{output_directory}/threshold_{img}', image, cmap='gray')
+    plt.imsave(f'{output_directory}/{imgName}/threshold_{img}', image, cmap='gray')
     
 
-def hough_transform(img='edge.png'):
+def hough_transform(img='edge.png', imgName='Im037_0'):
     '''
     This is the Circle Hough Transform function (CHT), which counts the
     circles from an input image.
@@ -402,12 +342,12 @@ def hough_transform(img='edge.png'):
 
     :return --> saves the output image under the folder output/<cell_type>/hough_transform.png
     '''
-    if not os.path.exists(output_directory + '/' + img):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'{output_directory}/{img}')
+    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -431,25 +371,25 @@ def hough_transform(img='edge.png'):
             cv2.circle(output, (x, y), r, (0, 0, 255), 2)
             cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 0, 255), -1)
         # save the output image
-        plt.imsave(f'{output_directory}/hough_transform.png',
+        plt.imsave(f'{output_directory}/{imgName}/hough_transform.png',
                    np.hstack([img, output]))
         # show the hough_transform results
         print(f'Hough transform: {len(circles)}')
 
 
-def component_labeling(img='edge.png'):
+def component_labeling(img='edge.png', imgName='Im037_0'):
     '''
     This is the Connected Component Labeling (CCL), which labels all the connected objects from an input image
     :param img --> the input image that we want to apply CCL to.
 
     :return --> saves the output image under the folder output/<cell_type>/component_labeling.png
     '''
-    if not os.path.exists(output_directory + '/' + img):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'{output_directory}/{img}')
+    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # converting those pixels with values 1-127 to 0 and others to 1
@@ -469,26 +409,26 @@ def component_labeling(img='edge.png'):
     output[label_hue==0] = 0
     
     # saving image after Component Labeling
-    plt.imsave(f'{output_directory}/component_labeling.png',
+    plt.imsave(f'{output_directory}/{imgName}/component_labeling.png',
                np.hstack([image, output]))
 
     # show number of labels detected
     print(f'Connected component labeling: {num_labels}')
 
 
-def distance_transform(img='threshold_edge_mask.png'):
+def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
     '''
     This is the Euclidean Distance Transform function (EDT), which applied the distance transform algorithm to an input image>
     :param img --> the input image that we want to apply EDT to.
 
     :return --> saves the output image under the folder output/<cell_type>/distance_transform.png
     '''
-    if not os.path.exists(output_directory + '/' + img):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
         print('Image does not exist!')
         return
 
     # getting the input image
-    image = cv2.imread(f'{output_directory}/{img}')
+    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to numpy array
     img = np.asarray(image)
     # convert to grayscale
@@ -498,7 +438,26 @@ def distance_transform(img='threshold_edge_mask.png'):
     img = ndimage.binary_dilation(img)
 
     # saving image after Component Labeling
-    plt.imsave(f'{output_directory}/distance_transform.png', img, cmap='gray')
+    plt.imsave(f'{output_directory}/{imgName}/distance_transform.png', img, cmap='gray')
+
+
+def predict_all_idb():
+    image_list = sorted(glob.glob('data/ALL-IDB1/*'))
+    for image in image_list:
+        img = image.split('/')[-1].split('.')[0]
+        predict(img)
+        threshold('mask.png', img)
+
+        if cell_type == 'rbc':
+            threshold('edge.png', img)
+            threshold('edge_mask.png', img)
+            distance_transform('threshold_edge_mask.png', img)
+            hough_transform('edge.png', img)
+        else:
+            distance_transform('threshold_mask.png', img)
+            hough_transform('mask.png', img)
+
+        component_labeling('distance_transform.png', img)
 
 
 if __name__ == '__main__':
@@ -508,17 +467,19 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=50)
     # evaluate(model_name='rbc')
-    predict()
-    threshold('mask.png')
+    # predict()
+    # threshold('mask.png')
 
-    if cell_type == 'rbc':
-        threshold('edge.png')
-        threshold('edge_mask.png')
-        distance_transform('threshold_edge_mask.png')
-        hough_transform('edge.png')
-    else:
-        distance_transform('threshold_mask.png')
-        hough_transform('mask.png')
+    # if cell_type == 'rbc':
+    #     threshold('edge.png')
+    #     threshold('edge_mask.png')
+    #     distance_transform('threshold_edge_mask.png')
+    #     hough_transform('edge.png')
+    # else:
+    #     distance_transform('threshold_mask.png')
+    #     hough_transform('mask.png')
 
-    component_labeling('distance_transform.png')
+    # component_labeling('distance_transform.png')
+
+    predict_all_idb()
 

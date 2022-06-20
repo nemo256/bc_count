@@ -60,6 +60,20 @@ def clahe_images(img_list):
     return img_list
 
 
+def preprocess_image(imgs, padding=padding[1]):
+    '''
+    This is the preprocess data function, which adds a padding to 
+    the input images, masks and edges if there are any.
+    :param imgs --> the input list of images.
+    :param padding --> the input padding which is going to be applied.
+
+    :return imgs --> output images with added padding.
+    '''
+    imgs = [np.pad(img, ((padding, padding),
+                         (padding, padding), (0, 0)), mode='constant') for img in imgs]
+    return imgs
+
+
 def preprocess_data(imgs, mask, edge=None, padding=padding[1]):
     '''
     This is the preprocess data function, which adds a padding to 
@@ -105,6 +119,19 @@ def load_data(img_list, mask_list, edge_list=None, padding=padding[1]):
         edge = None
 
     return preprocess_data(imgs, mask, edge, padding=padding)
+
+
+def load_image(img_list, padding=padding[1]):
+    '''
+    This is the load data function, which will handle image loading and preprocessing.
+    :param img_list --> list of input images
+    :param padding --> padding to be applied on preprocessing
+
+    :return imgs --> the output preprocessed imgs.
+    '''
+    imgs = load_image_list(img_list)
+    imgs = clahe_images(imgs)
+    return preprocess_image(imgs, padding=padding)
 
 
 def aug_lum(image, factor=None):
@@ -310,6 +337,40 @@ def test_chips(imgs, mask,
                 else:
                     yield temp_chip, ((temp_mask > 0).astype(float)[..., np.newaxis])
                 break
+
+
+def slice_image(imgs,
+                padding=padding[1],
+                input_size=input_shape[0],
+                output_size=output_shape[0]):
+    '''
+    This is the slice function, which slices each image into image chips.
+    :param imgs --> the input images
+    :param padding --> the padding which will be applied to each image
+    :param input_size --> the input shape
+    :param output_size --> the output shape
+
+    :return list tuple (list, list, list) --> the tuple list of output (image, mask and edge chips)
+    '''
+    img_chips = []
+
+    center_offset = padding + (output_size / 2)
+    for i, _ in enumerate(imgs):
+        for x in np.arange(center_offset, imgs[i].shape[0] - input_size / 2, output_size):
+            for y in np.arange(center_offset, imgs[i].shape[1] - input_size / 2, output_size):
+                chip_x_l = int(x - (input_size / 2))
+                chip_x_r = int(x + (input_size / 2))
+                chip_y_l = int(y - (input_size / 2))
+                chip_y_r = int(y + (input_size / 2))
+
+                temp_chip = imgs[i][chip_x_l:chip_x_r, chip_y_l:chip_y_r]
+
+                temp_chip = temp_chip.astype(np.float32) * 2
+                temp_chip /= 255
+                temp_chip -= 1
+
+                img_chips += [temp_chip]
+    return np.array(img_chips)
 
 
 def slice(imgs, mask,
