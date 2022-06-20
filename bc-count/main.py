@@ -19,6 +19,8 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from scipy import ndimage
+from skimage.segmentation import watershed
+from skimage.feature import peak_local_max
 
 # custom imports
 from config import *
@@ -355,7 +357,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
     elif cell_type == 'wbc':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=21, maxRadius=120, minRadius=48, param1=18, param2=15)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
     elif cell_type == 'plt':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, .5, minDist=25, maxRadius=20, minRadius=10, param1=18, param2=12)
     output = img.copy()
@@ -375,6 +377,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
                    np.hstack([img, output]))
         # show the hough_transform results
         print(f'Hough transform: {len(circles)}')
+        return len(circles)
 
 
 def component_labeling(img='edge.png', imgName='Im037_0'):
@@ -414,6 +417,7 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
 
     # show number of labels detected
     print(f'Connected component labeling: {num_labels}')
+    return num_labels
 
 
 def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
@@ -435,30 +439,85 @@ def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     img = ndimage.distance_transform_edt(img)
-    img = ndimage.binary_dilation(img)
 
     # saving image after Component Labeling
     plt.imsave(f'{output_directory}/{imgName}/distance_transform.png', img, cmap='gray')
 
 
+def count(img='threshold_mask.png', imgName='Im037_0'):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
+        print('Image does not exist!')
+        return
+
+    # getting the input image
+    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
+    # convert to numpy array
+    img = np.asarray(image)
+    # convert to grayscale
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    edt = ndimage.distance_transform_edt(img)
+
+    img = peak_local_max(edt, 
+                         indices=False,
+                         num_peaks=20,
+                         min_distance=45, 
+                         exclude_border=True,
+                         labels=img)
+
+    img = ndimage.binary_dilation(img)
+    # saving image after counting
+    plt.imsave(f'{output_directory}/{imgName}/count.png', img, cmap='gray')
+
+
+def watershed(img='mask.png', imgName='Im037_0'):
+    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
+        print('Image does not exist!')
+        return
+
+    # getting the input image
+    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
+    # convert to numpy array
+    img = np.asarray(image)
+    # convert to grayscale
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    edt = ndimage.distance_transform_edt(img)
+    coord = peak_local_max(edt, footprint=np.ones((3, 3)), labels=img)
+    mask = np.zeros(edt.shape, dtype=bool)
+    mask[tuple(coord.T)] = True
+    markers, _ = ndimage.label(mask)
+    # converting those pixels with values 1-127 to 0 and others to 1
+    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
+    img = watershed(-edt, markers, mask=img)
+
+    # saving image after counting
+    plt.imsave(f'{output_directory}/{imgName}/watershed.png', img, cmap='gray')
+
+
 def predict_all_idb():
     image_list = sorted(glob.glob('data/ALL-IDB1/*'))
-    for image in image_list:
-        img = image.split('/')[-1].split('.')[0]
-        predict(img)
-        threshold('mask.png', img)
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory, exist_ok=True)
+    with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as f:
+        for image in image_list:
+            img = image.split('/')[-1].split('.')[0]
+            predict(img)
+            threshold('mask.png', img)
 
-        if cell_type == 'rbc':
-            threshold('edge.png', img)
-            threshold('edge_mask.png', img)
-            distance_transform('threshold_edge_mask.png', img)
-            hough_transform('edge.png', img)
-        else:
-            distance_transform('threshold_mask.png', img)
-            hough_transform('mask.png', img)
+            if cell_type == 'rbc':
+                threshold('edge.png', img)
+                threshold('edge_mask.png', img)
+                distance_transform('threshold_edge_mask.png', img)
+                hough_transform('edge.png', img)
+            else:
+                distance_transform('threshold_mask.png', img)
+                cht_count = hough_transform('mask.png', img)
 
-        component_labeling('distance_transform.png', img)
-
+            count('threshold_mask.png', img)
+            ccl_count = component_labeling('count.png', img)
+            f.write(f'{img} {cht_count} {ccl_count}\n')
+        
 
 if __name__ == '__main__':
     '''
@@ -479,7 +538,9 @@ if __name__ == '__main__':
     #     distance_transform('threshold_mask.png')
     #     hough_transform('mask.png')
 
-    # component_labeling('distance_transform.png')
+    # count('threshold_mask.png')
+    # component_labeling('count.png')
+    # watershed('mask.png')
 
     predict_all_idb()
 
