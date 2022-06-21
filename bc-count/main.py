@@ -468,7 +468,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     coords = peak_local_max(edt, 
                             indices=True,
                             num_peaks=2000,
-                            min_distance=77, 
+                            min_distance=81, 
                             exclude_border=False,
                             labels=img)
 
