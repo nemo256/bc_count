@@ -540,7 +540,7 @@ def predict_all_idb():
         r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
         r.write(f'CCL Accuracy: {np.mean(ccl_accuracy)}\n')
         r.write(f'EDT Accuracy: {np.mean(edt_accuracy)}\n')
-        
+
 
 if __name__ == '__main__':
     '''
@@ -565,5 +565,6 @@ if __name__ == '__main__':
     # count('threshold_mask.png', image)
     # component_labeling('count.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
+    generate_rbc()
 
