@@ -495,7 +495,7 @@ def predict_all_idb():
         os.makedirs(output_directory, exist_ok=True)
 
     real_count = []
-    with open('real_count.txt', 'r+') as rc:
+    with open(f'{cell_type}_count.txt', 'r+') as rc:
         file = rc.read().splitlines()
         for line in file:
             real_count += [line.split(' ')[-1]]
@@ -541,21 +541,21 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=50)
     # evaluate(model_name='rbc')
-    image = 'Im020_1'
-    predict(imgName=image)
-    threshold('mask.png', image)
+    # image = 'Im014_1'
+    # predict(imgName=image)
+    # threshold('mask.png', image)
 
-    if cell_type == 'rbc':
-        threshold('edge.png', image)
-        threshold('edge_mask.png', image)
-        distance_transform('threshold_edge_mask.png', image)
-        hough_transform('edge.png', image)
-    else:
-        distance_transform('threshold_mask.png', image)
-        hough_transform('mask.png', image)
+    # if cell_type == 'rbc':
+    #     threshold('edge.png', image)
+    #     threshold('edge_mask.png', image)
+    #     distance_transform('threshold_edge_mask.png', image)
+    #     hough_transform('edge.png', image)
+    # else:
+    #     distance_transform('threshold_mask.png', image)
+    #     hough_transform('mask.png', image)
 
-    count('threshold_mask.png', image)
-    component_labeling('count.png', image)
+    # count('threshold_mask.png', image)
+    # component_labeling('count.png', image)
 
-    # predict_all_idb()
+    predict_all_idb()
 
