@@ -460,7 +460,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
 
     if cell_type == 'rbc':
-        min_distance = 60
+        min_distance = 40
     elif cell_type == 'wbc':
         min_distance = 81
     elif cell_type == 'plt':
@@ -471,7 +471,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
     count = peak_local_max(edt, 
                            indices=False,
-                           num_peaks=20,
+                           num_peaks=2000,
                            min_distance=45, 
                            exclude_border=False,
                            labels=img)
