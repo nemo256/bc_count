@@ -499,7 +499,15 @@ def predict_all_idb():
     image_list = sorted(glob.glob('data/ALL-IDB1/*'))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory, exist_ok=True)
-    with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as f:
+
+    real_count = []
+    with open('real_count.txt', 'r+') as rc:
+        file = rc.read().splitlines()
+        for line in file:
+            real_count += [line.split(' ')[-1]]
+
+    i = 0
+    with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as r:
         for image in image_list:
             img = image.split('/')[-1].split('.')[0]
             predict(img)
@@ -516,7 +524,8 @@ def predict_all_idb():
 
             count('threshold_mask.png', img)
             ccl_count = component_labeling('count.png', img)
-            f.write(f'{img} {cht_count} {ccl_count}\n')
+            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count}\n')
+            i = i + 1
         
 
 if __name__ == '__main__':
