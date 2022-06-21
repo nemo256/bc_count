@@ -416,8 +416,8 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
                np.hstack([image, output]))
 
     # show number of labels detected
-    print(f'Connected component labeling: {num_labels}')
-    return num_labels
+    print(f'Connected component labeling: {num_labels - 1}')
+    return num_labels - 1
 
 
 def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
@@ -458,41 +458,33 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
     edt = ndimage.distance_transform_edt(img)
 
-    img = peak_local_max(edt, 
-                         indices=False,
-                         num_peaks=20,
-                         min_distance=45, 
-                         exclude_border=True,
-                         labels=img)
+    count = peak_local_max(edt, 
+                           indices=False,
+                           num_peaks=20,
+                           min_distance=45, 
+                           exclude_border=False,
+                           labels=img)
 
-    img = ndimage.binary_dilation(img)
-    # saving image after counting
-    plt.imsave(f'{output_directory}/{imgName}/count.png', img, cmap='gray')
+    coords = peak_local_max(edt, 
+                            indices=True,
+                            num_peaks=2000,
+                            min_distance=74, 
+                            exclude_border=False,
+                            labels=img)
 
-
-def watershed(img='mask.png', imgName='Im037_0'):
-    if not os.path.exists(f'{output_directory}/{imgName}/{img}'):
-        print('Image does not exist!')
-        return
-
-    # getting the input image
-    image = cv2.imread(f'{output_directory}/{imgName}/{img}')
-    # convert to numpy array
-    img = np.asarray(image)
-    # convert to grayscale
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    edt = ndimage.distance_transform_edt(img)
-    coord = peak_local_max(edt, footprint=np.ones((3, 3)), labels=img)
-    mask = np.zeros(edt.shape, dtype=bool)
-    mask[tuple(coord.T)] = True
-    markers, _ = ndimage.label(mask)
-    # converting those pixels with values 1-127 to 0 and others to 1
-    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
-    img = watershed(-edt, markers, mask=img)
+    # print(coords[:, 1])
+    canvas = np.ones(img.shape + (3,), dtype=np.uint8) * 255
+    i = 255
+    for c in coords:
+        o_c = (int(c[1]), int(c[0]))
+        cv2.circle(canvas, o_c, 20, (i, 0, 0), -1)
+        i = i - 1
 
     # saving image after counting
-    plt.imsave(f'{output_directory}/{imgName}/watershed.png', img, cmap='gray')
+    plt.imsave(f'{output_directory}/{imgName}/count.png', count, cmap='gray')
+    plt.imsave(f'{output_directory}/{imgName}/output.png', canvas, cmap='gray')
+    print(f'Euclidean Distance Transform:  {len(coords)}')
+    return len(coords)
 
 
 def predict_all_idb():
@@ -507,25 +499,37 @@ def predict_all_idb():
             real_count += [line.split(' ')[-1]]
 
     i = 0
+    acc = []
     with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as r:
+        r.write('Image Real_Count CHT CCL EDT CHT_Accuracy CCL_Accuracy EDT_Accuracy Accuracy\n')
         for image in image_list:
             img = image.split('/')[-1].split('.')[0]
             predict(img)
             threshold('mask.png', img)
 
+            print(f'Real Count: {real_count[i]}')
             if cell_type == 'rbc':
                 threshold('edge.png', img)
                 threshold('edge_mask.png', img)
                 distance_transform('threshold_edge_mask.png', img)
-                hough_transform('edge.png', img)
+                cht_count = hough_transform('edge.png', img)
             else:
                 distance_transform('threshold_mask.png', img)
                 cht_count = hough_transform('mask.png', img)
 
-            count('threshold_mask.png', img)
+            edt_count = count('threshold_mask.png', img)
             ccl_count = component_labeling('count.png', img)
-            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count}\n')
+            cht_accuracy = (1 - (np.absolute(int(cht_count) - int(real_count[i])) / int(real_count[i]))) * 100
+            ccl_accuracy = (1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100
+            edt_accuracy = (1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100
+            # accuracy = np.mean([cht_accuracy, ccl_accuracy])
+            accuracy = edt_accuracy
+            acc += [accuracy]
+            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy} {ccl_accuracy} {edt_accuracy} {accuracy}\n')
             i = i + 1
+
+        acc = np.mean(acc)
+        r.write(f'Resulting accuracy: {acc}\n')
         
 
 if __name__ == '__main__':
@@ -549,7 +553,6 @@ if __name__ == '__main__':
 
     # count('threshold_mask.png')
     # component_labeling('count.png')
-    # watershed('mask.png')
 
     predict_all_idb()
 
