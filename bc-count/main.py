@@ -359,7 +359,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     elif cell_type == 'wbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
     elif cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.4, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -549,21 +549,21 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=20)
     # evaluate(model_name='rbc')
-    # image = 'Im004_1'
-    # predict(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im026_1'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('count.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('count.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
