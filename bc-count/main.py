@@ -541,20 +541,21 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=50)
     # evaluate(model_name='rbc')
-    # predict()
-    # threshold('mask.png')
+    image = 'Im020_1'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png')
-    #     threshold('edge_mask.png')
-    #     distance_transform('threshold_edge_mask.png')
-    #     hough_transform('edge.png')
-    # else:
-    #     distance_transform('threshold_mask.png')
-    #     hough_transform('mask.png')
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('mask.png', image)
 
-    # count('threshold_mask.png')
-    # component_labeling('count.png')
+    count('threshold_mask.png', image)
+    component_labeling('count.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 

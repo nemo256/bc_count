@@ -1,5 +1,5 @@
 __pycache__/
 bc_count.egg-info/
 dist/
-# models/
+models/
 venv/
