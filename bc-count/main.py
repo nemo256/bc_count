@@ -543,7 +543,7 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('plt_segnet', epochs=20)
+    # train('plt_segnet', epochs=20)
     # evaluate(model_name='rbc')
     # image = 'Im003_1'
     # predict(imgName=image)
@@ -561,5 +561,5 @@ if __name__ == '__main__':
     # count('threshold_mask.png', image)
     # component_labeling('count.png', image)
 
-    # predict_all_idb()
+    predict_all_idb()
 
