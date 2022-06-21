@@ -177,7 +177,7 @@ def predict(imgName='Im037_0'):
         print('Prediction already exists!')
         return
 
-    test_img = sorted(glob.glob(f'data/ALL-IDB1/{imgName}.jpg'))
+    test_img = sorted(glob.glob(f'data/ALL-IDB1-{cell_type}/{imgName}.jpg'))
 
     # initializing the do_unet model
     if model_type == 'do_unet':
