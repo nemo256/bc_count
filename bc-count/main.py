@@ -512,7 +512,7 @@ def predict_all_idb():
     ccl_accuracy = []
     edt_accuracy = []
     with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as r:
-        r.write('Image Real_Count CHT CCL EDT CHT_Accuracy CCL_Accuracy EDT_Accuracy\n')
+        r.write('Image Real_Count CHT CCL CHT_Accuracy CCL_Accuracy\n')
         for image in image_list:
             img = image.split('/')[-1].split('.')[0]
             predict(img)
@@ -534,12 +534,12 @@ def predict_all_idb():
             ccl_accuracy += [(1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100]
             edt_accuracy += [(1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
-            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
+            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {cht_accuracy[i]} {ccl_accuracy[i]}\n')
             i = i + 1
 
         r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
         r.write(f'CCL Accuracy: {np.mean(ccl_accuracy)}\n')
-        r.write(f'EDT Accuracy: {np.mean(edt_accuracy)}\n')
+        # r.write(f'EDT Accuracy: {np.mean(edt_accuracy)}\n')
         
 
 if __name__ == '__main__':
