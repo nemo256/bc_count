@@ -508,9 +508,11 @@ def predict_all_idb():
             real_count += [line.split(' ')[-1]]
 
     i = 0
-    acc = []
+    cht_accuracy = []
+    ccl_accuracy = []
+    edt_accuracy = []
     with open(f'{output_directory}/{cell_type}_results.txt', 'a+') as r:
-        r.write('Image Real_Count CHT CCL EDT CHT_Accuracy CCL_Accuracy EDT_Accuracy Accuracy\n')
+        r.write('Image Real_Count CHT CCL EDT CHT_Accuracy CCL_Accuracy EDT_Accuracy\n')
         for image in image_list:
             img = image.split('/')[-1].split('.')[0]
             predict(img)
@@ -528,20 +530,16 @@ def predict_all_idb():
 
             edt_count = count('threshold_mask.png', img)
             ccl_count = component_labeling('count.png', img)
-            cht_accuracy = (1 - (np.absolute(int(cht_count) - int(real_count[i])) / int(real_count[i]))) * 100
-            ccl_accuracy = (1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100
-            edt_accuracy = (1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100
+            cht_accuracy += [(1 - (np.absolute(int(cht_count) - int(real_count[i])) / int(real_count[i]))) * 100]
+            ccl_accuracy += [(1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100]
+            edt_accuracy += [(1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
-            if cell_type == 'plt':
-                accuracy = ccl_accuracy
-            else:
-                accuracy = edt_accuracy
-            acc += [accuracy]
-            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy} {ccl_accuracy} {edt_accuracy} {accuracy}\n')
+            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
             i = i + 1
 
-        acc = np.mean(acc)
-        r.write(f'Resulting accuracy: {acc}\n')
+        r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
+        r.write(f'CCL Accuracy: {np.mean(ccl_accuracy)}\n')
+        r.write(f'EDT Accuracy: {np.mean(edt_accuracy)}\n')
         
 
 if __name__ == '__main__':
