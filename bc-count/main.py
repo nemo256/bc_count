@@ -460,6 +460,10 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
     edt = ndimage.distance_transform_edt(img)
 
+    if cell_type == 'wbc':
+        min_distance = 81
+    elif cell_type == 'plt':
+        min_distance = 120
     count = peak_local_max(edt, 
                            indices=False,
                            num_peaks=20,
@@ -470,7 +474,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     coords = peak_local_max(edt, 
                             indices=True,
                             num_peaks=2000,
-                            min_distance=81, 
+                            min_distance=min_distance, 
                             exclude_border=False,
                             labels=img)
 
