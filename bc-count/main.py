@@ -378,6 +378,8 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
         # show the hough_transform results
         print(f'Hough transform: {len(circles)}')
         return len(circles)
+    else:
+        return 0
 
 
 def component_labeling(img='edge.png', imgName='Im037_0'):
