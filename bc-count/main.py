@@ -359,7 +359,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     elif cell_type == 'wbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
     elif cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=20, maxRadius=20, minRadius=8, param1=14, param2=12)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.4, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
     output = img.copy()
 
     # ensure at least some circles were found
