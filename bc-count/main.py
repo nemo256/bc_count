@@ -497,7 +497,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
 
 def predict_all_idb():
-    image_list = sorted(glob.glob('data/ALL-IDB1/*'))
+    image_list = sorted(glob.glob(f'data/ALL-IDB1-{cell_type}/*'))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory, exist_ok=True)
 
