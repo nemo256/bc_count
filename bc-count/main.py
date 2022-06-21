@@ -532,7 +532,10 @@ def predict_all_idb():
             ccl_accuracy = (1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100
             edt_accuracy = (1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
-            accuracy = edt_accuracy
+            if cell_type == 'plt':
+                accuracy = ccl_accuracy
+            else:
+                accuracy = edt_accuracy
             acc += [accuracy]
             r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy} {ccl_accuracy} {edt_accuracy} {accuracy}\n')
             i = i + 1
@@ -548,7 +551,7 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=20)
     # evaluate(model_name='rbc')
-    # image = 'Im006_1'
+    # image = 'Im046_0'
     # predict(imgName=image)
     # threshold('mask.png', image)
 
