@@ -277,7 +277,7 @@ def evaluate(model_name='mse'):
 
     # load test data
     if cell_type == 'rbc':
-        img, mask, edge = data.load_data(test_img, test_mask, test_edge, padding=padding[0])
+        img, mask, edge = data.load_data(test_img_list, test_mask_list, test_edge_list, padding=padding[0])
 
         img_chips, mask_chips, edge_chips = data.slice(
             img,
@@ -288,9 +288,9 @@ def evaluate(model_name='mse'):
             output_size=output_shape[0]
         )
     elif cell_type == 'wbc' or cell_type == 'plt':
-        img, mask = data.load_data(test_img, test_mask, padding=padding[0])
+        img, mask = data.load_data(test_img_list, test_mask_list, padding=padding[0])
 
-        img_chips, mask_chips = data.test_slice(
+        img_chips, mask_chips = data.slice(
             img,
             mask,
             padding=padding[1],
@@ -550,7 +550,7 @@ if __name__ == '__main__':
     (later on, this will dynamically call functions according user input)
     '''
     train('wbc_segnet', epochs=80)
-    # evaluate(model_name='rbc')
+    # evaluate(model_name='wbc_segnet')
     # image = 'Im026_1'
     # predict(imgName=image)
     # threshold('mask.png', image)
