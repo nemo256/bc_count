@@ -565,6 +565,5 @@ if __name__ == '__main__':
     # count('threshold_mask.png', image)
     # component_labeling('count.png', image)
 
-    # predict_all_idb()
-    generate_rbc()
+    predict_all_idb()
 
