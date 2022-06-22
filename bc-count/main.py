@@ -472,7 +472,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
         min_distance = 40
     elif cell_type == 'wbc':
         min_distance = 51
-        threshold_abs = 24.1
+        threshold_abs = 24
     elif cell_type == 'plt':
         min_distance = 52
         img = ndimage.binary_dilation(img)
