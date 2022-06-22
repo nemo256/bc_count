@@ -355,6 +355,10 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # apply surface filter
+    img = surfaceFilter(img, min_size=2000)
+
+    img = ((img > 0) * 255.).astype(np.uint8)
 
     # apply hough circles
     if cell_type == 'rbc':
@@ -363,7 +367,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
         if model_type == 'do_unet':
             circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
         else:
-            circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 0.89, minDist=20, maxRadius=120, minRadius=48, param1=20, param2=11)
+            circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=70, maxRadius=120, minRadius=33, param1=51, param2=10)
     elif cell_type == 'plt':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
     output = img.copy()
@@ -453,6 +457,37 @@ def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
 
     # saving image after Component Labeling
     plt.imsave(f'{output_directory}/{imgName}/distance_transform.png', img, cmap='gray')
+
+
+def surfaceFilter(image, min_size = None, max_size = None):
+    img = image.copy()
+    ret, labels = cv2.connectedComponents(img)
+    
+    label_codes = np.unique(labels)
+    result_image = labels
+    
+    if 9999  in result_image:
+        print("error the image contains the null number 9999")
+    
+    i = 0
+    background_index = 0
+    max = 0
+    for label in label_codes:
+        count = (labels == label).sum()
+
+        #find the background index
+        if count > max:
+            max = count
+            background_index = i
+
+        if min_size is not None and (count < min_size):
+            result_image[labels == label] = 9999
+
+        if max_size is not None and (count > max_size):
+            result_image[labels == label] = 9999
+        i = i + 1
+    result_image[result_image == 9999] = label_codes[background_index]
+    return result_image
 
 
 def count(img='threshold_mask.png', imgName='Im037_0'):
@@ -568,21 +603,21 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
-    # image = 'Im086_0'
-    # predict(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im079_0'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('threshold_mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('threshold_mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('threshold_mask.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('threshold_mask.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
