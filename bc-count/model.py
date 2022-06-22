@@ -145,7 +145,7 @@ def do_unet():
 
     if cell_type == 'rbc':
         model.compile(loss='mse',
-                      loss_weights=[0.1, 0.9],
+                      loss_weights=[0.3, 0.7],
                       optimizer=opt,
                       metrics='accuracy')
     elif cell_type == 'wbc' or cell_type == 'plt':
