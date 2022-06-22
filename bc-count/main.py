@@ -602,21 +602,21 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='rbc_segnet')
-    image = 'Im045_0'
-    predict(imgName=image)
-    threshold('mask.png', image)
+    # image = 'Im045_0'
+    # predict(imgName=image)
+    # threshold('mask.png', image)
 
-    if cell_type == 'rbc':
-        threshold('edge.png', image)
-        threshold('edge_mask.png', image)
-        distance_transform('threshold_edge_mask.png', image)
-        hough_transform('edge.png', image)
-    else:
-        distance_transform('threshold_mask.png', image)
-        hough_transform('threshold_mask.png', image)
+    # if cell_type == 'rbc':
+    #     threshold('edge.png', image)
+    #     threshold('edge_mask.png', image)
+    #     distance_transform('threshold_edge_mask.png', image)
+    #     hough_transform('edge.png', image)
+    # else:
+    #     distance_transform('threshold_mask.png', image)
+    #     hough_transform('threshold_mask.png', image)
 
-    count('threshold_mask.png', image)
-    component_labeling('threshold_mask.png', image)
+    # count('threshold_mask.png', image)
+    # component_labeling('threshold_mask.png', image)
 
-    # predict_all_idb()
+    predict_all_idb()
 
