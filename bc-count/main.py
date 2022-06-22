@@ -330,7 +330,10 @@ def threshold(img='edge.png', imgName='Im037_0'):
 
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        otsu_threshold, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU,)
+        if cell_type == 'wbc':
+            threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+        else:
+            threshold, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
 
     # save the resulting thresholded image
     plt.imsave(f'{output_directory}/{imgName}/threshold_{img}', image, cmap='gray')
@@ -549,23 +552,23 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('wbc_segnet', epochs=250)
+    # train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
-    # image = 'Im026_1'
-    # predict(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im037_0'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('count.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('count.png', image)
 
     # predict_all_idb()
 
