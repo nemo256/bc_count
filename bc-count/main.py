@@ -356,7 +356,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # apply surface filter
-    img, ret_count = surfaceFilter(img, min_size=2000)
+    img, ret_count = surfaceFilter(img, min_size=1700)
 
     img = ((img > 0) * 255.).astype(np.uint8)
 
