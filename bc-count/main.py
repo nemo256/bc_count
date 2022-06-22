@@ -415,7 +415,10 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
     # converting those pixels with values 1-127 to 0 and others to 1
     img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
     # applying surfaceFilter
-    result_image, ret_count = surfaceFilter(img, min_size=1400)
+    if cell_type == 'wbc':
+        result_image, ret_count = surfaceFilter(img, min_size=1400)
+    else:
+        result_image, ret_count = surfaceFilter(img)
 
     # saving image after Component Labeling
     plt.imsave(f'{output_directory}/{imgName}/component_labeling.png',
