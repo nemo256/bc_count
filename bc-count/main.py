@@ -549,7 +549,7 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('wbc_segnet', epochs=80)
+    train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
     # image = 'Im026_1'
     # predict(imgName=image)
