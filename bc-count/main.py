@@ -498,17 +498,19 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     # convert to grayscale
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-
     if cell_type == 'rbc':
-        min_distance = 40
+        min_distance = 30
         threshold_abs = None
+        exclude_border = True
     elif cell_type == 'wbc':
         min_distance = 51
         threshold_abs = 24
+        exclude_border = False
     elif cell_type == 'plt':
         min_distance = 52
         img = ndimage.binary_dilation(img)
         threshold_abs = None
+        exclude_border = False
 
     edt = ndimage.distance_transform_edt(img)
 
@@ -517,7 +519,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
                             num_peaks=2000,
                             min_distance=min_distance, 
                             threshold_abs=threshold_abs,
-                            exclude_border=False,
+                            exclude_border=exclude_border,
                             labels=img)
 
     # print(coords[:, 1])
