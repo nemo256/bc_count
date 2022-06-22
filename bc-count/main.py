@@ -360,7 +360,10 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     if cell_type == 'rbc':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=33, maxRadius=55, minRadius=28, param1=30, param2=20)
     elif cell_type == 'wbc':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=81, maxRadius=120, minRadius=48, param1=70, param2=20)
+        if model_type == 'do_unet':
+            circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=51, maxRadius=120, minRadius=48, param1=70, param2=20)
+        else:
+            circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 0.89, minDist=20, maxRadius=120, minRadius=48, param1=20, param2=11)
     elif cell_type == 'plt':
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
     output = img.copy()
@@ -465,24 +468,20 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     if cell_type == 'rbc':
         min_distance = 40
     elif cell_type == 'wbc':
-        min_distance = 81
+        min_distance = 51
+        threshold_abs = 16
     elif cell_type == 'plt':
         min_distance = 52
         img = ndimage.binary_dilation(img)
+        threshold_abs = None
 
     edt = ndimage.distance_transform_edt(img)
-
-    count = peak_local_max(edt, 
-                           indices=False,
-                           num_peaks=2000,
-                           min_distance=45, 
-                           exclude_border=False,
-                           labels=img)
 
     coords = peak_local_max(edt, 
                             indices=True,
                             num_peaks=2000,
                             min_distance=min_distance, 
+                            threshold_abs=threshold_abs,
                             exclude_border=False,
                             labels=img)
 
@@ -495,10 +494,20 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
         i = i - 1
 
     # saving image after counting
-    plt.imsave(f'{output_directory}/{imgName}/count.png', count, cmap='gray')
     plt.imsave(f'{output_directory}/{imgName}/output.png', canvas, cmap='gray')
     print(f'Euclidean Distance Transform:  {len(coords)}')
     return len(coords)
+
+
+def accuracy(real, predicted):
+    acc = (1 - (np.absolute(int(predicted) - int(real)) / int(real))) * 100
+    if real == 0 and predicted == 0:
+        return 100
+    if acc <= 100 and acc > 0
+        return acc
+    elif acc < 0:
+        return np.absolute(acc / 100)
+
 
 
 def predict_all_idb():
@@ -531,13 +540,13 @@ def predict_all_idb():
                 cht_count = hough_transform('edge.png', img)
             else:
                 distance_transform('threshold_mask.png', img)
-                cht_count = hough_transform('mask.png', img)
+                cht_count = hough_transform('threshold_mask.png', img)
 
             edt_count = count('threshold_mask.png', img)
-            ccl_count = component_labeling('count.png', img)
-            cht_accuracy += [(1 - (np.absolute(int(cht_count) - int(real_count[i])) / int(real_count[i]))) * 100]
-            ccl_accuracy += [(1 - (np.absolute(int(ccl_count) - int(real_count[i])) / int(real_count[i]))) * 100]
-            edt_accuracy += [(1 - (np.absolute(int(edt_count) - int(real_count[i])) / int(real_count[i]))) * 100]
+            ccl_count = component_labeling('threshold_mask.png', img)
+            cht_accuracy += [accuracy(real_count[i], cht_count)]
+            ccl_accuracy += [accuracy(real_count[i], ccl_count)]
+            edt_accuracy += [accuracy(real_count[i], edt_count)]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
             r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
             i = i + 1
@@ -554,7 +563,7 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
-    image = 'Im037_0'
+    image = 'Im024_1'
     predict(imgName=image)
     threshold('mask.png', image)
 
@@ -565,10 +574,10 @@ if __name__ == '__main__':
         hough_transform('edge.png', image)
     else:
         distance_transform('threshold_mask.png', image)
-        hough_transform('mask.png', image)
+        hough_transform('threshold_mask.png', image)
 
     count('threshold_mask.png', image)
-    component_labeling('count.png', image)
+    component_labeling('threshold_mask.png', image)
 
     # predict_all_idb()
 
