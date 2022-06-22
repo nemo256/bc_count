@@ -503,7 +503,7 @@ def accuracy(real, predicted):
     acc = (1 - (np.absolute(int(predicted) - int(real)) / int(real))) * 100
     if real == 0 and predicted == 0:
         return 100
-    if acc <= 100 and acc > 0
+    if acc <= 100 and acc > 0:
         return acc
     elif acc < 0:
         return np.absolute(acc / 100)
