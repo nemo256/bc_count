@@ -330,7 +330,9 @@ def threshold(img='edge.png', imgName='Im037_0'):
 
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        if cell_type == 'wbc':
+        if cell_type == 'plt':
+            threshold, image = cv2.threshold(image, 130, 255, cv2.THRESH_BINARY)
+        elif cell_type == 'wbc':
             threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         else:
             threshold, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
@@ -371,7 +373,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
         else:
             circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=70, maxRadius=120, minRadius=33, param1=62, param2=12)
     elif cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=20, maxRadius=24, minRadius=5, param1=13, param2=11)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=16, maxRadius=24, minRadius=5, param1=13, param2=11)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -507,7 +509,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
         threshold_abs = 24
         exclude_border = False
     elif cell_type == 'plt':
-        min_distance = 52
+        min_distance = 20
         img = ndimage.binary_dilation(img)
         threshold_abs = None
         exclude_border = False
@@ -600,21 +602,21 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='rbc_segnet')
-    # image = 'Im079_0'
-    # predict(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im099_0'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('threshold_mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('threshold_mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('threshold_mask.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('threshold_mask.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
