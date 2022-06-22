@@ -499,7 +499,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     if cell_type == 'rbc':
-        min_distance = 30
+        min_distance = 40
         threshold_abs = None
         exclude_border = True
     elif cell_type == 'wbc':
