@@ -460,7 +460,7 @@ def surfaceFilter(image, min_size = None, max_size = None):
     label_codes = np.unique(labels)
     result_image = labels
     
-    if 9999  in result_image:
+    if 9999 in result_image:
         print("error the image contains the null number 9999")
     
     i = 0
