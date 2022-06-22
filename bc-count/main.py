@@ -496,6 +496,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
     if cell_type == 'rbc':
         min_distance = 40
+        threshold_abs = None
     elif cell_type == 'wbc':
         min_distance = 51
         threshold_abs = 24
