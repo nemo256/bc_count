@@ -472,7 +472,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
         min_distance = 40
     elif cell_type == 'wbc':
         min_distance = 51
-        threshold_abs = 24
+        threshold_abs = 24.2
     elif cell_type == 'plt':
         min_distance = 52
         img = ndimage.binary_dilation(img)
@@ -533,9 +533,9 @@ def predict_all_idb():
         r.write('Image Real_Count CHT CCL EDT CHT_Accuracy CCL_Accuracy EDT_Accuracy\n')
         for image in image_list:
             img = image.split('/')[-1].split('.')[0]
+            print(f'--------------------------------------------------')
             predict(img)
             threshold('mask.png', img)
-            print(f'--------------------------------------------------')
             print(f'Image <-- {img} -->')
             print(f'Real Count: {real_count[i]}')
             if cell_type == 'rbc':
