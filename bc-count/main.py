@@ -510,6 +510,8 @@ def accuracy(real, predicted):
         return acc
     elif acc < 0:
         return np.absolute(acc / 100)
+    else:
+        return 0
 
 
 def predict_all_idb():
