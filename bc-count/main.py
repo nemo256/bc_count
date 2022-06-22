@@ -355,10 +355,12 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # apply surface filter
-    img, ret_count = surfaceFilter(img, min_size=2000)
 
-    img = ((img > 0) * 255.).astype(np.uint8)
+    if cell_type == 'wbc':
+        # apply surface filter
+        img, ret_count = surfaceFilter(img, min_size=2000)
+
+        img = ((img > 0) * 255.).astype(np.uint8)
 
     # apply hough circles
     if cell_type == 'rbc':
