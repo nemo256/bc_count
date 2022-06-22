@@ -331,7 +331,7 @@ def threshold(img='edge.png', imgName='Im037_0'):
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         if cell_type == 'plt':
-            threshold, image = cv2.threshold(image, 130, 255, cv2.THRESH_BINARY)
+            threshold, image = cv2.threshold(image, 42, 255, cv2.THRESH_BINARY)
         elif cell_type == 'wbc':
             threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         else:
@@ -602,7 +602,7 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='rbc_segnet')
-    image = 'Im099_0'
+    image = 'Im045_0'
     predict(imgName=image)
     threshold('mask.png', image)
 
