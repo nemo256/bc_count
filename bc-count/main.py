@@ -388,7 +388,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
         plt.imsave(f'{output_directory}/{imgName}/hough_transform.png',
                    np.hstack([img, output]))
         # show the hough_transform results
-        print(f'Hough transform: {len(circles)}')
+        print(f'Hough Transform: {len(circles)}')
         if len(circles) == None:
             return 0
         else:
@@ -425,7 +425,7 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
                np.hstack([img, result_image]))
 
     # show number of labels detected
-    print(f'Connected component labeling: {ret_count - 1}')
+    print(f'Connected Component Labeling: {ret_count - 1}')
     return ret_count - 1
 
 
@@ -599,7 +599,7 @@ if __name__ == '__main__':
     (later on, this will dynamically call functions according user input)
     '''
     # train('wbc_segnet', epochs=250)
-    # evaluate(model_name='wbc_segnet')
+    evaluate()
     # image = 'Im079_0'
     # predict(imgName=image)
     # threshold('mask.png', image)
@@ -616,5 +616,5 @@ if __name__ == '__main__':
     # count('threshold_mask.png', image)
     # component_labeling('threshold_mask.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
