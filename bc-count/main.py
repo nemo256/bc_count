@@ -599,7 +599,7 @@ if __name__ == '__main__':
     (later on, this will dynamically call functions according user input)
     '''
     # train('wbc_segnet', epochs=250)
-    evaluate()
+    evaluate(model_name='rbc')
     # image = 'Im079_0'
     # predict(imgName=image)
     # threshold('mask.png', image)
