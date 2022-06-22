@@ -472,7 +472,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
         min_distance = 40
     elif cell_type == 'wbc':
         min_distance = 51
-        threshold_abs = 17
+        threshold_abs = 18
     elif cell_type == 'plt':
         min_distance = 52
         img = ndimage.binary_dilation(img)
@@ -554,7 +554,6 @@ def predict_all_idb():
             edt_accuracy += [accuracy(real_count[i], edt_count)]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
             r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
-            print(f'--------------------------------------------------')
             i = i + 1
 
         r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
