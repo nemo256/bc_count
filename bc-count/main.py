@@ -420,8 +420,8 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
                np.hstack([img, result_image]))
 
     # show number of labels detected
-    print(f'Connected component labeling: {ret_count}')
-    return ret_count
+    print(f'Connected component labeling: {ret_count - 1}')
+    return ret_count - 1
 
 
 def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
