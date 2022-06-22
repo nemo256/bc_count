@@ -356,7 +356,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # apply surface filter
-    img = surfaceFilter(img, min_size=2000)
+    img, ret_count = surfaceFilter(img, min_size=2000)
 
     img = ((img > 0) * 255.).astype(np.uint8)
 
@@ -412,27 +412,16 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # converting those pixels with values 1-127 to 0 and others to 1
     img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
-    # applying cv2.connectedComponents() 
-    num_labels, labels = cv2.connectedComponents(img)
-    
-    # map component labels to hue val, 0-179 is the hue range in OpenCV
-    label_hue = np.uint8(179*labels/np.max(labels))
-    blank_ch = 255*np.ones_like(label_hue)
-    output = cv2.merge([label_hue, blank_ch, blank_ch])
+    # applying surfaceFilter
+    result_image, ret_count = surfaceFilter(img, min_size=2000)
 
-    # converting cvt to BGR
-    output = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
-
-    # set bg label to black
-    output[label_hue==0] = 0
-    
     # saving image after Component Labeling
     plt.imsave(f'{output_directory}/{imgName}/component_labeling.png',
-               np.hstack([image, output]))
+               np.hstack([img, result_image]))
 
     # show number of labels detected
-    print(f'Connected component labeling: {num_labels - 1}')
-    return num_labels - 1
+    print(f'Connected component labeling: {ret_count - 1}')
+    return ret_count - 1
 
 
 def distance_transform(img='threshold_edge_mask.png', imgName='Im037_0'):
@@ -482,12 +471,14 @@ def surfaceFilter(image, min_size = None, max_size = None):
 
         if min_size is not None and (count < min_size):
             result_image[labels == label] = 9999
+            ret = ret - 1
 
         if max_size is not None and (count > max_size):
             result_image[labels == label] = 9999
+            ret = ret - 1
         i = i + 1
     result_image[result_image == 9999] = label_codes[background_index]
-    return result_image
+    return result_image, ret
 
 
 def count(img='threshold_mask.png', imgName='Im037_0'):
@@ -603,21 +594,21 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
-    # image = 'Im079_0'
-    # predict(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im079_0'
+    predict(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('threshold_mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('threshold_mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('threshold_mask.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('threshold_mask.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
