@@ -356,7 +356,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # apply surface filter
-    img, ret_count = surfaceFilter(img, min_size=1500)
+    img, ret_count = surfaceFilter(img, min_size=2000)
 
     img = ((img > 0) * 255.).astype(np.uint8)
 
@@ -413,7 +413,7 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
     # converting those pixels with values 1-127 to 0 and others to 1
     img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
     # applying surfaceFilter
-    result_image, ret_count = surfaceFilter(img, min_size=2000)
+    result_image, ret_count = surfaceFilter(img, min_size=1700)
 
     # saving image after Component Labeling
     plt.imsave(f'{output_directory}/{imgName}/component_labeling.png',
