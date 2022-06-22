@@ -587,12 +587,10 @@ def predict_all_idb():
             ccl_accuracy += [accuracy(real_count[i], ccl_count)]
             edt_accuracy += [accuracy(real_count[i], edt_count)]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
-            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
+            r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {np.round(cht_accuracy[i], 2)} {np.round(ccl_accuracy[i], 2)} {np.round(edt_accuracy[i], 2)}\n')
             i = i + 1
 
-        r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
-        r.write(f'CCL Accuracy: {np.mean(ccl_accuracy)}\n')
-        r.write(f'EDT Accuracy: {np.mean(edt_accuracy)}\n')
+        r.write(f'Total -1 -1 -1 -1 {np.round(np.mean(cht_accuracy), 2)} {np.round(np.mean(ccl_accuracy), 2)} {np.round(np.mean(edt_accuracy), 2)}\n')
 
 
 if __name__ == '__main__':
