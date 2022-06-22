@@ -535,7 +535,8 @@ def predict_all_idb():
             img = image.split('/')[-1].split('.')[0]
             predict(img)
             threshold('mask.png', img)
-
+            print(f'--------------------------------------------------')
+            print(f'Image <-- {img} -->')
             print(f'Real Count: {real_count[i]}')
             if cell_type == 'rbc':
                 threshold('edge.png', img)
@@ -553,6 +554,7 @@ def predict_all_idb():
             edt_accuracy += [accuracy(real_count[i], edt_count)]
             # accuracy = np.mean([cht_accuracy, ccl_accuracy])
             r.write(f'{img} {real_count[i]} {cht_count} {ccl_count} {edt_count} {cht_accuracy[i]} {ccl_accuracy[i]} {edt_accuracy[i]}\n')
+            print(f'--------------------------------------------------')
             i = i + 1
 
         r.write(f'CHT Accuracy: {np.mean(cht_accuracy)}\n')
