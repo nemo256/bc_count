@@ -383,7 +383,10 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
                    np.hstack([img, output]))
         # show the hough_transform results
         print(f'Hough transform: {len(circles)}')
-        return len(circles)
+        if len(circles) == None:
+            return 0
+        else:
+            return len(circles)
     else:
         return 0
 
@@ -562,7 +565,7 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='wbc_segnet')
-    # image = 'Im024_1'
+    # image = 'Im086_0'
     # predict(imgName=image)
     # threshold('mask.png', image)
 
