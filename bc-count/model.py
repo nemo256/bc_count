@@ -147,7 +147,7 @@ def do_unet():
         model.compile(loss='mse',
                       loss_weights=[0.1, 0.9],
                       optimizer=opt,
-                      metrics=['accuracy', 'iou'])
+                      metrics=['accuracy'])
     elif cell_type == 'wbc' or cell_type == 'plt':
         model.compile(loss='mse',
                       optimizer=opt,
