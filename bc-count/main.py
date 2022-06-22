@@ -177,7 +177,7 @@ def predict(imgName='Im037_0'):
         print('Prediction already exists!')
         return
 
-    test_img = sorted(glob.glob(f'data/ALL-IDB1-{cell_type}/{imgName}.jpg'))
+    test_img = sorted(glob.glob(f'data/ALL-IDB1-FULL/{imgName}.jpg'))
 
     # initializing the do_unet model
     if model_type == 'do_unet':
@@ -549,7 +549,7 @@ def accuracy(real, predicted):
 
 
 def predict_all_idb():
-    image_list = sorted(glob.glob(f'data/ALL-IDB1-{cell_type}/*'))
+    image_list = sorted(glob.glob('data/ALL-IDB1/*'))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory, exist_ok=True)
 
@@ -599,7 +599,7 @@ if __name__ == '__main__':
     (later on, this will dynamically call functions according user input)
     '''
     # train('wbc_segnet', epochs=250)
-    # evaluate(model_name='rbc')
+    # evaluate(model_name='rbc_segnet')
     # image = 'Im079_0'
     # predict(imgName=image)
     # threshold('mask.png', image)
