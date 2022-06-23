@@ -161,7 +161,7 @@ def denoise(img):
     img = cv2.imread(img)
     # return the denoised image
     if cell_type == 'plt':
-        return cv2.fastNlMeansDenoising(img, 20, 20, 7, 20)
+        return cv2.fastNlMeansDenoising(img, 19, 19, 7, 21)
     return cv2.fastNlMeansDenoising(img, 23, 23, 7, 21)
 
 
@@ -243,7 +243,7 @@ def denoise_full_image(imgName='Im037_0'):
         edge_mask = denoise(f'{output_directory}/{imgName}/edge_mask.png')
 
     # save predicted mask and edge after denoising
-    plt.imsave(f'{output_directory}/{imgName}/mask.png', new_mask)
+    plt.imsave(f'{output_directory}/{imgName}/denoise.png', new_mask)
     if cell_type == 'rbc':
         plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', edge_mask)
@@ -334,7 +334,7 @@ def threshold(img='edge.png', imgName='Im037_0'):
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         if cell_type == 'plt':
-            threshold, image = cv2.threshold(image, 81, 255, cv2.THRESH_BINARY)
+            threshold, image = cv2.threshold(image, 67, 255, cv2.THRESH_BINARY)
         elif cell_type == 'wbc':
             threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         else:
@@ -376,7 +376,7 @@ def hough_transform(img='edge.png', imgName='Im037_0'):
         else:
             circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=70, maxRadius=120, minRadius=33, param1=62, param2=12)
     elif cell_type == 'plt':
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=16, maxRadius=24, minRadius=5, param1=13, param2=11)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.3, minDist=16, maxRadius=25, minRadius=1, param1=13, param2=11)
     output = img.copy()
 
     # ensure at least some circles were found
@@ -514,7 +514,7 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
     elif cell_type == 'plt':
         min_distance = 20
         img = ndimage.binary_dilation(img)
-        threshold_abs = None
+        threshold_abs = 4
         exclude_border = False
 
     edt = ndimage.distance_transform_edt(img)
@@ -578,9 +578,8 @@ def predict_all_idb():
             img = image.split('/')[-1].split('.')[0]
             print(f'--------------------------------------------------')
             predict(img)
-            # if cell_type != 'plt':
             denoise_full_image(img)
-            threshold('mask.png', img)
+            threshold('denoise.png', img)
             print(f'Image <-- {img} -->')
             print(f'Real Count: {real_count[i]}')
             if cell_type == 'rbc':
@@ -589,11 +588,11 @@ def predict_all_idb():
                 distance_transform('threshold_edge_mask.png', img)
                 cht_count = hough_transform('edge.png', img)
             else:
-                distance_transform('threshold_mask.png', img)
-                cht_count = hough_transform('threshold_mask.png', img)
+                distance_transform('threshold_denoise.png', img)
+                cht_count = hough_transform('threshold_denoise.png', img)
 
-            edt_count = count('threshold_mask.png', img)
-            ccl_count = component_labeling('threshold_mask.png', img)
+            edt_count = count('threshold_denoise.png', img)
+            ccl_count = component_labeling('threshold_denoise.png', img)
             cht_accuracy += [accuracy(real_count[i], cht_count)]
             ccl_accuracy += [accuracy(real_count[i], ccl_count)]
             edt_accuracy += [accuracy(real_count[i], edt_count)]
@@ -609,13 +608,13 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    # train('wbc_segnet', epochs=250)
+    train('plt_segnet', epochs=50)
     # evaluate(model_name='rbc_segnet')
     # image = 'Im079_0'
     # predict(imgName=image)
     # if cell_type != 'plt':
     #     denoise_full_image(imgName=image)
-    # threshold('mask.png', image)
+    # threshold('denoise.png', image)
 
     # if cell_type == 'rbc':
     #     threshold('edge.png', image)
@@ -623,11 +622,11 @@ if __name__ == '__main__':
     #     distance_transform('threshold_edge_mask.png', image)
     #     hough_transform('edge.png', image)
     # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('threshold_mask.png', image)
+    #     distance_transform('threshold_denoise.png', image)
+    #     hough_transform('threshold_denoise.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('threshold_mask.png', image)
+    # count('threshold_denoise.png', image)
+    # component_labeling('threshold_denoise.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
