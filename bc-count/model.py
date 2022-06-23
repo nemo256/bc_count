@@ -85,6 +85,67 @@ def get_callbacks(name):
     ]
 
 
+# loss functions
+@tf.function
+def dsc(y_true, y_pred):
+    smooth = 1.0
+    y_true_f = tf.reshape(y_true, [-1])
+    y_pred_f = tf.reshape(y_pred, [-1])
+    intersection = tf.reduce_sum(y_true_f * y_pred_f)
+    return (2.0 * intersection + smooth) / (tf.reduce_sum(y_true_f) +
+                                            tf.reduce_sum(y_pred_f) +
+                                            smooth)
+
+
+@tf.function
+def dice_loss(y_true, y_pred):
+    return 1 - dsc(y_true, y_pred)
+
+
+@tf.function
+def tversky(y_true, y_pred):
+    alpha = 0.7
+    smooth = 1.0
+    y_true_pos = tf.reshape(y_true, [-1])
+    y_pred_pos = tf.reshape(y_pred, [-1])
+    true_pos = tf.reduce_sum(y_true_pos * y_pred_pos)
+    false_neg = tf.reduce_sum(y_true_pos * (1 - y_pred_pos))
+    false_pos = tf.reduce_sum((1 - y_true_pos) * y_pred_pos)
+    return (true_pos + smooth) / (true_pos + alpha * false_neg + (1 - alpha) * false_pos + smooth)
+
+
+@tf.function
+def tversky_loss(y_true, y_pred):
+    return 1 - tversky(y_true, y_pred)
+
+
+@tf.function
+def focal_tversky(y_true, y_pred):
+    return tf.pow((1 - tversky(y_true, y_pred)), 0.75)
+
+
+@tf.function
+def iou(y_true, y_pred):
+    intersect = tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    union = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
+    return tf.reduce_mean(tf.math.divide_no_nan(intersect, (union - intersect)), axis=1)
+
+
+@tf.function
+def mean_iou(y_true, y_pred):
+    y_true_32 = tf.cast(y_true, tf.float32)
+    y_pred_32 = tf.cast(y_pred, tf.float32)
+    score = tf.map_fn(lambda x: iou(y_true_32, tf.cast(y_pred_32 > x, tf.float32)),
+                      tf.range(0.5, 1.0, 0.05, tf.float32),
+                      tf.float32)
+    return tf.reduce_mean(score)
+
+
+@tf.function
+def iou_loss(y_true, y_pred):
+    return -1*mean_iou(y_true, y_pred)
+
+
 def do_unet():
     '''
     This is the dual output U-Net model.
