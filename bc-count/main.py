@@ -609,7 +609,7 @@ if __name__ == '__main__':
     (later on, this will dynamically call functions according user input)
     '''
     # train('plt_segnet', epochs=12)
-    evaluate(model_name='rbc_segnet')
+    evaluate(model_name='wbc_segnet')
     # image = 'Im037_0'
     # predict(imgName=image)
     # denoise_full_image(imgName=image)
