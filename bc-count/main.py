@@ -612,8 +612,7 @@ if __name__ == '__main__':
     # evaluate(model_name='rbc_segnet')
     image = 'Im037_0'
     predict(imgName=image)
-    if cell_type != 'plt':
-        denoise_full_image(imgName=image)
+    denoise_full_image(imgName=image)
     threshold('denoise.png', image)
 
     if cell_type == 'rbc':
