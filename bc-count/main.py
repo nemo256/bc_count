@@ -610,7 +610,7 @@ if __name__ == '__main__':
     '''
     train('plt_segnet', epochs=12)
     # evaluate(model_name='rbc_segnet')
-    # image = 'Im079_0'
+    # image = 'Im037_0'
     # predict(imgName=image)
     # if cell_type != 'plt':
     #     denoise_full_image(imgName=image)

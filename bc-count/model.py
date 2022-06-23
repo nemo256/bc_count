@@ -294,5 +294,5 @@ def segnet():
     elif cell_type == 'plt':
         model.compile(loss=iou_loss,
                       optimizer=opt,
-                      metrics=[mean_iou, dsc, tversky])
+                      metrics=[mean_iou, dsc, tversky, 'accuracy'])
     return model
