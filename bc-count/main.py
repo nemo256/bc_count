@@ -608,24 +608,24 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    # train('plt_segnet', epochs=12)
+    train('plt_segnet', epochs=12)
     # evaluate(model_name='rbc_segnet')
-    image = 'Im037_0'
-    predict(imgName=image)
-    denoise_full_image(imgName=image)
-    threshold('denoise.png', image)
+    # image = 'Im037_0'
+    # predict(imgName=image)
+    # denoise_full_image(imgName=image)
+    # threshold('denoise.png', image)
 
-    if cell_type == 'rbc':
-        threshold('edge.png', image)
-        threshold('edge_mask.png', image)
-        distance_transform('threshold_edge_mask.png', image)
-        hough_transform('edge.png', image)
-    else:
-        distance_transform('threshold_denoise.png', image)
-        hough_transform('threshold_denoise.png', image)
+    # if cell_type == 'rbc':
+    #     threshold('edge.png', image)
+    #     threshold('edge_mask.png', image)
+    #     distance_transform('threshold_edge_mask.png', image)
+    #     hough_transform('edge.png', image)
+    # else:
+    #     distance_transform('threshold_denoise.png', image)
+    #     hough_transform('threshold_denoise.png', image)
 
-    count('threshold_denoise.png', image)
-    component_labeling('threshold_denoise.png', image)
+    # count('threshold_denoise.png', image)
+    # component_labeling('threshold_denoise.png', image)
 
     # predict_all_idb()
 
