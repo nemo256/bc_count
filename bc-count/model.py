@@ -292,7 +292,7 @@ def segnet():
                       optimizer=opt,
                       metrics='accuracy')
     elif cell_type == 'plt':
-        model.compile(loss=iou_loss,
+        model.compile(loss=focal_tversky,
                       optimizer=opt,
                       metrics=[mean_iou, dsc, tversky, 'accuracy'])
     return model
