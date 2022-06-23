@@ -78,7 +78,7 @@ def get_callbacks(name):
     :param name --> the input model name
     '''
     return [
-        tf.keras.callbacks.ModelCheckpoint(f'/notebooks/bc-count/plt_segnet.h5',
+        tf.keras.callbacks.ModelCheckpoint(f'models/{name}.h5',
                                            save_best_only=True,
                                            save_weights_only=True,
                                            verbose=1)
