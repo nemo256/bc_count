@@ -160,6 +160,8 @@ def denoise(img):
     # read the image
     img = cv2.imread(img)
     # return the denoised image
+    if cell_type == 'plt':
+        return cv2.fastNlMeansDenoising(img, 20, 20, 7, 20)
     return cv2.fastNlMeansDenoising(img, 23, 23, 7, 21)
 
 
@@ -332,7 +334,7 @@ def threshold(img='edge.png', imgName='Im037_0'):
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         if cell_type == 'plt':
-            threshold, image = cv2.threshold(image, 57, 255, cv2.THRESH_BINARY)
+            threshold, image = cv2.threshold(image, 81, 255, cv2.THRESH_BINARY)
         elif cell_type == 'wbc':
             threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         else:
@@ -415,8 +417,8 @@ def component_labeling(img='edge.png', imgName='Im037_0'):
     image = cv2.imread(f'{output_directory}/{imgName}/{img}')
     # convert to grayscale
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # converting those pixels with values 1-127 to 0 and others to 1
-    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
+    # # converting those pixels with values 1-127 to 0 and others to 1
+    # img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]
     # applying surfaceFilter
     if cell_type == 'wbc':
         result_image, ret_count = surfaceFilter(img, min_size=1400)
@@ -576,8 +578,8 @@ def predict_all_idb():
             img = image.split('/')[-1].split('.')[0]
             print(f'--------------------------------------------------')
             predict(img)
-            if cell_type != 'plt':
-                denoise_full_image(img)
+            # if cell_type != 'plt':
+            denoise_full_image(img)
             threshold('mask.png', img)
             print(f'Image <-- {img} -->')
             print(f'Real Count: {real_count[i]}')
