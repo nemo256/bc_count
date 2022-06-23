@@ -232,18 +232,19 @@ def predict(imgName='Im037_0'):
         plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
         plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', new_mask - new_edge)
 
-    if model_type == 'segnet':
-        # denoise all the output images
-        new_mask  = denoise(f'{output_directory}/{imgName}/mask.png')
-        if cell_type == 'rbc':
-            new_edge  = denoise(f'{output_directory}/{imgName}/edge.png')
-            edge_mask = denoise(f'{output_directory}/{imgName}/edge_mask.png')
 
-        # save predicted mask and edge after denoising
-        plt.imsave(f'{output_directory}/{imgName}/mask.png', new_mask)
-        if cell_type == 'rbc':
-            plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
-            plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', edge_mask)
+def denoise_full_image(imgName='Im037_0'):
+    # denoise all the output images
+    new_mask  = denoise(f'{output_directory}/{imgName}/mask.png')
+    if cell_type == 'rbc':
+        new_edge  = denoise(f'{output_directory}/{imgName}/edge.png')
+        edge_mask = denoise(f'{output_directory}/{imgName}/edge_mask.png')
+
+    # save predicted mask and edge after denoising
+    plt.imsave(f'{output_directory}/{imgName}/mask.png', new_mask)
+    if cell_type == 'rbc':
+        plt.imsave(f'{output_directory}/{imgName}/edge.png', new_edge)
+        plt.imsave(f'{output_directory}/{imgName}/edge_mask.png', edge_mask)
 
 
 def evaluate(model_name='mse'):
@@ -331,7 +332,7 @@ def threshold(img='edge.png', imgName='Im037_0'):
         # convert to grayscale and apply otsu's thresholding
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         if cell_type == 'plt':
-            threshold, image = cv2.threshold(image, 42, 255, cv2.THRESH_BINARY)
+            threshold, image = cv2.threshold(image, 57, 255, cv2.THRESH_BINARY)
         elif cell_type == 'wbc':
             threshold, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         else:
@@ -534,20 +535,24 @@ def count(img='threshold_mask.png', imgName='Im037_0'):
 
     # saving image after counting
     plt.imsave(f'{output_directory}/{imgName}/output.png', canvas, cmap='gray')
-    print(f'Euclidean Distance Transform:  {len(coords)}')
+    print(f'Euclidean Distance Transform: {len(coords)}')
     return len(coords)
 
 
 def accuracy(real, predicted):
     acc = (1 - (np.absolute(int(predicted) - int(real)) / int(real))) * 100
-    if real == 0 and predicted == 0:
-        return 100
-    if acc <= 100 and acc > 0:
+    if int(real) == 0.:
+        if int(predicted) == 0.:
+            return 100.
+        else:
+            return 0.
+
+    if acc <= 100. and acc > 0.:
         return acc
-    elif acc < 0:
-        return np.absolute(acc / 100)
+    elif acc < 0.:
+        return np.absolute(acc / 100.)
     else:
-        return 0
+        return 0.
 
 
 def predict_all_idb():
@@ -571,6 +576,8 @@ def predict_all_idb():
             img = image.split('/')[-1].split('.')[0]
             print(f'--------------------------------------------------')
             predict(img)
+            if cell_type != 'plt':
+                denoise_full_image(img)
             threshold('mask.png', img)
             print(f'Image <-- {img} -->')
             print(f'Real Count: {real_count[i]}')
@@ -602,8 +609,10 @@ if __name__ == '__main__':
     '''
     # train('wbc_segnet', epochs=250)
     # evaluate(model_name='rbc_segnet')
-    # image = 'Im045_0'
+    # image = 'Im079_0'
     # predict(imgName=image)
+    # if cell_type != 'plt':
+    #     denoise_full_image(imgName=image)
     # threshold('mask.png', image)
 
     # if cell_type == 'rbc':
