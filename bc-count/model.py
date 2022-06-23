@@ -287,8 +287,12 @@ def segnet():
                       loss_weights=[0.1, 0.9],
                       optimizer=opt,
                       metrics='accuracy')
-    elif cell_type == 'wbc' or cell_type == 'plt':
+    elif cell_type == 'wbc':
         model.compile(loss='mse',
                       optimizer=opt,
                       metrics='accuracy')
+    elif cell_type == 'plt':
+        model.compile(loss=iou_loss,
+                      optimizer=opt,
+                      metrics=[mean_iou, dsc, tversky])
     return model
