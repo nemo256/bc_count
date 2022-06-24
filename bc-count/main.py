@@ -608,8 +608,8 @@ if __name__ == '__main__':
     The main function, which handles all the function call
     (later on, this will dynamically call functions according user input)
     '''
-    train('plt_segnet', epochs=12)
-    # evaluate(model_name='plt_segnet')
+    # train('plt_segnet', epochs=12)
+    evaluate(model_name='plt_segnet')
     # image = 'Im037_0'
     # predict(imgName=image)
     # denoise_full_image(imgName=image)
