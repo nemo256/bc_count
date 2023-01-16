@@ -622,22 +622,22 @@ if __name__ == '__main__':
     '''
     # train('plt_segnet', epochs=12)
     # evaluate(model_name='plt_segnet')
-    # image = 'Im037_0'
-    # predict(imgName=image)
-    # # denoise_full_image(imgName=image)
-    # threshold('mask.png', image)
+    image = 'Im037_0'
+    predict(imgName=image)
+    # denoise_full_image(imgName=image)
+    threshold('mask.png', image)
 
-    # if cell_type == 'rbc':
-    #     threshold('edge.png', image)
-    #     threshold('edge_mask.png', image)
-    #     distance_transform('threshold_edge_mask.png', image)
-    #     hough_transform('edge.png', image)
-    # else:
-    #     distance_transform('threshold_mask.png', image)
-    #     hough_transform('threshold_mask.png', image)
+    if cell_type == 'rbc':
+        threshold('edge.png', image)
+        threshold('edge_mask.png', image)
+        distance_transform('threshold_edge_mask.png', image)
+        hough_transform('edge.png', image)
+    else:
+        distance_transform('threshold_mask.png', image)
+        hough_transform('threshold_mask.png', image)
 
-    # count('threshold_mask.png', image)
-    # component_labeling('threshold_mask.png', image)
+    count('threshold_mask.png', image)
+    component_labeling('threshold_mask.png', image)
 
-    predict_all_idb()
+    # predict_all_idb()
 
