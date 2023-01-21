@@ -63,4 +63,4 @@ $ python bc-count/main.py
 ```
 
 ## License
-- Please read cell-count/LICENSE.
+- Please read [bc-count/LICENSE](https://github.com/nemo256/bc-count/blob/master/LICENSE)
